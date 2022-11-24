@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Waiting for Love Letter to begin</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+          $.ajaxSetup({
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+          });
+        });
+    </script>
+</head>
+<body>
+     <ul id="ul-navbar">
+        <li><a class="navbar" href="../../">Home</a></li>
+        <li>
+            <div class="dropdown">
+                <span class="navbar">Games</span>
+                <ul class="dropdown">
+                    <div class="dropdown-content">
+                        <li><a class="action" href="../">Love Letter</a></li>
+                        <li><a class="action" href="../../kingdomino">KingDomino</a></li>
+                    </div>
+                </ul>
+            </div>
+        </li>
+        <li><a class="navbar" href="stats">Statistics</a></li>
+	</ul>
+     <div class="box-body">
+         <span id="game" class="{{ gameid }}">Game id: {{ gameid }}</span>
+         <span>User id: {{ userid }}</span>
+         <p>Number of players: <span id="playing">{{ nr }}</span></p>
+         <p>Waiting for <span id="missing">{{ x }}</span> more players </p>
+         <p id="test">...</p>
+         <span id="start_game_btn"></span>
+     </div>
+     <script type="text/javascript" src="{% static 'waiting.js' %}">
+     </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="box_body">
+    <table>
+        <tr border="3">
+            <td>Game id</td>
+            <td>Game state</td>
+            <td>Number of players</td>
+            <td>Missing players</td>
+            <td>Player 1</td>
+            <td>Player2</td>
+            <td>Player3</td>
+            <td>Player4</td>
+
+        </tr>
+        {% for x in games %}
+        <tr border="3">
+            <td>{{ x.game_nr }}</td>
+            <td>{{ x.state }}</td>
+            <td>{{ x.nr_players }}</td>
+            <td>{{ x.miss_pl }}</td>
+            <td>{{ x.player1 }}</td>
+            <td>{{ x.player2 }}</td>
+            <td>{{ x.player3 }}</td>
+            <td>{{ x.player4 }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <table>
+        <tr>
+            <td>User id</td>
+            <td>User state</td>
+            <td>Number of players</td>
+            <td>Game id</td>
+        </tr>
+        {% for y in users %}
+        <tr>
+            <td>{{ y.user_nr }}</td>
+            <td>{{ y.state }}</td>
+            <td>{{ y.nr_players }}</td>
+            <td>{{ y.game_nr }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
+</body>
+</html>

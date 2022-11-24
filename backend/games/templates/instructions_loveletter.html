@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	{% load static %}
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>How to Play</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+</head>
+<body>
+	<ul id="ul-navbar">
+		<li><a class="navbar" href="../../">Home</a></li>
+		<li><a class="navbar" href="../">Love Letter</a></li>
+		<li><a class="navbar" href="stats">Statistics</a></li>
+	</ul>
+	<div class="box-body">
+		<h2>How to play</h2>
+
+		<ul>
+			<li><a href="#setup">Setup</a></li>
+			<li><a href="#gameplay">Game play</a></li>
+			<li>
+				<ul>
+					<li><a href="#turns">Turns</a></li>
+					<li><a href="#out">Out of round</a></li>
+					<li><a href="#round_end">End of a round</a></li>
+					<li><a href="#end_game"></a>End of the game</li>
+				</ul>
+			</li>
+			<li><a href="#cards">Cards</a></li>
+		</ul>
+		<h3 id="setup">Setup</h3>
+		<p>Before the beginning of the game each player is dealt a card</p>
+
+		<h3 id="gameplay">Game play</h3>
+		<p>Love Letter is played in a series of rounds. Each round represents one day. At the end of each round, one player's letter reaches Princess Annette, and she reads it.</p>
+		<p>When she reads enough letters from one suitor, she becomes enamored and grants that suitor permission to court her. That player wins the princess's heart and the game.</p>
+
+		<h4 id="turns">Taking a turn</h4>
+		<p>On your turn, draw the top card from the deck and add it to your hand. Then choose one of the two cards in your hand and discard it face up in front of you. Apply any effect on the card you discarded. You must apply its effect, even if it is bad for you.</p>
+		<p>All discarded cards remain in front of the player who discarded them. Overlap the cards so that it's clear in which order they were discarded. This helps players to figure out which cards other players might be holding.</p>
+		<p>Once you finish applying the card's effect, the turn passes to the player on your left.On your turn, draw the top card from the deck and add it to your hand. Then choose one of the two cards in your hand and discard it face up in front of you. Apply any effect on the card you discarded. You must apply its effect, even if it is bad for you.<br>Once you finish applying the card's effect, the turn passes to the player on your left.</p>
+
+		<h4 id="out">Out of the round</h4>
+		<p>If a player is knocked out of the round, that player discards the card in his or her hand face up (do not apply the card's effect) and takes no more turns until next round.</p>
+
+		<h4 id="round_end">End of a round</h4>
+		<p>A round ends if the deck is empty at the end of a turn. All players still in the round reveal their hands. The player with the highest ranked person wins the round. In case of a tie, the player who discarded the highest total value of cards wins.<br>A round also ends if all players but one are out of the round, in which case the remaining player wins.<br>The winner receives a token of affection. All 16 cards are shuffled, and a new round begins, the winner of the previous round goes first.</p>
+
+		<h4 id="end_game">End of game</h4>
+		<p>The game ends when someone collects the necessary number affection tokens to win the game.<br>
+		<ul>This is:
+			<li>for 2 players: 7 tokens</li>
+			<li>for 3 players: 5 tokens</li>
+			<li>for 4 players: 4 tokens</li>
+		</ul>
+		</p>
+
+		<h3 id="cards">Cards</h3>
+		<ul>
+			<li><img src="{% static 'Love letter/guard.jpeg' %}" alt="Guard"><br>1. Guard<br>Action: </li>
+		</ul>
+	</div>
+	
+</body>
+</html>

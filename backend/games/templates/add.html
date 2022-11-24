@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add game</title>
+</head>
+<body>
+    <h1>Add member</h1>
+    <form action="addrecord/" method="post">
+        {% csrf_token %}
+        Game's name:<br>
+        <input name="game">
+        <br><br>
+        Publisher's name:<br>
+        <input name="publisher">
+        <br><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

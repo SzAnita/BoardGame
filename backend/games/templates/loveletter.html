@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <title>About Love Letter</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+</head>
+<body>
+  <ul id="ul-navbar">
+    <li><a class="navbar" href="../">Home</a></li>
+    <li>
+      <div class="dropdown">
+        <span class="navbar">Games</span>
+        <ul class="dropdown">
+          <div class="dropdown-content">
+            <li><a class="action" href="loveletter">Love Letter</a></li>
+            <li><a class="action" href="KingDomino\kingdomino.html">KingDomino</a></li>
+          </div>
+        </ul>
+      </div>
+    </li>
+    <li><a class="navbar"  href="stats">Statistics</a></li>
+  </ul>
+  <div class="box-body">
+    <ul>
+      <li><img src="{% static 'Love letter/loveletterbox.png' %}" alt="Love Letter"  height="250px"></li>
+		<li class="li">
+			<h3>Background story and objective of game</h3>
+			<p>When Queen Marianna is arrested for high treason, her daughter is heartbroken. Opportunistic suitors throughout the city-state of Tempest seek to ease Annette's sorrow, and win her affection, thereby also benefitting themselves.<br> However, the princess has locked herself into the palace, so the suitors have to see off the rival admirers of the princess, and also get their 'love letter' as close to the princess' inner circle as possible, - in the case of the game to eliminate their opponents with the help of their cards, but they have to choose carefully.</p>
+		</li>
+		<li class="link"><a href="instructions">How to play?</a></li>
+		<li class="link"><a href="get_nr_players">New game</a></li>
+		<li class="link"><a href="stats">Statistics</a></li>
+	</ul>
+  </div>
+</body>
+</html>

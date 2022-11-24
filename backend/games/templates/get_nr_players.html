@@ -1,0 +1,53 @@
+<?php
+	session_start()
+	$_SESSION['id'] = session_id()
+?>
+<!DOCTYPE html>
+<html>
+<head>
+	{% load static %}
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Playing Love Letter</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+</head>
+<body>
+	<ul id="ul-navbar">
+		<li><a class="navbar" href="../../">Home</a></li>
+            <li>
+                <div class="dropdown">
+                    <span class="navbar">Games</span>
+                    <ul class="dropdown">
+                        <div class="dropdown-content">
+                            <li><a class="action" href="../">Love Letter</a></li>
+                            <li><a class="action" href="../../kingdomino">KingDomino</a></li>
+                        </div>
+                    </ul>
+                </div>
+            </li>
+    	<li><a class="navbar" href="stats">Statistics</a></li>
+	</ul>
+	<div class="box-body">
+		<form action="../get_players/" id="form" method="get">
+			<fieldset>
+				<legend>With how many players do you want to play?</legend>
+				<input type="radio" id="2p" name="nr_players" value="2">
+				<label for="2p">2 players</label><br>
+				<input type="radio" id="3p" name="nr_players" value="3">
+				<label for="3p">3 players</label><br>
+				<input type="radio" id="4p" name="nr_players" value="4">
+				<label for="4p">4 players</label><br>
+				<input type="submit" value="Submit">
+			</fieldset>
+		</form>
+	</div>
+
+	<script type="text/javascript">
+		function replace() {
+			// body...
+			var form = getElementById('form')
+			form.innerHTML = "This is a test."
+		}
+	</script>
+</body>
+</html>

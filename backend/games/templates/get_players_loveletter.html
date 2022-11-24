@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+</head>
+<body>
+	<ul id="ul-navbar">
+		<li><a class="navbar" href="../../">Home</a></li>
+            <li>
+                <div class="dropdown">
+                    <span class="navbar">Games</span>
+                    <ul class="dropdown">
+                        <div class="dropdown-content">
+                            <li><a class="action" href="../">Love Letter</a></li>
+                            <li><a class="action" href="../../kingdomino">KingDomino</a></li>
+                        </div>
+                    </ul>
+                </div>
+            </li>
+    	<li><a class="navbar" href="stats">Statistics</a></li>
+	</ul>
+    <div class="box-body">
+        <p>{{ player1 }}</p>
+        <p>{{ player2 }}</p>
+    </div>
+</body>
+</html>
