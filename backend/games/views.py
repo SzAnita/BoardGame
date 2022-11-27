@@ -1,4 +1,7 @@
 import json
+import random
+from typing import Any
+
 import mimetype
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
@@ -6,6 +9,32 @@ from django.urls import reverse
 from django.template import loader
 from .models import Users, LoveLetter
 import simplejson
+
+
+class LoveLetterGame:
+    def __init__(self, game):
+        self.game_id = game
+        self.cards = [1, 1, 1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8]
+        self.game = LoveLetter.objects.get(game_nr=self.game_id)
+        self.players = [self.game.player1]
+        self.players_curr_cards = {
+            self.game.player1: []
+        }
+        self.players_discarded_cards = {
+            self.game.player1: []
+        }
+        self.action = self.players[0]
+
+    def get_new_card(self, player):
+        rand = random.randint(0, len(self.cards) - 1)
+        card = self.cards[rand]
+        self.cards.pop(rand)
+        self.players_curr_cards[player].append(card)
+        return card
+
+
+global ll
+ll = {}
 
 
 def checks(user_id):
@@ -89,7 +118,7 @@ def get_players_loveletter(request):
         user.game_nr = "ll{}".format(LoveLetter.objects.all().count() + 1)
     user.save()
     request.session['game_id'] = user.game_nr
-    nr_game = user.game_nr
+    nr_game: str | Any = user.game_nr
     player1 = request.session.get('user_id')
     player2 = ''
     player3 = ''
@@ -98,10 +127,14 @@ def get_players_loveletter(request):
     if len(waiting_games) == 0:
         love_letter = LoveLetter(nr_players, player1, player2, player3, player4, nr_game, 'waiting', nr_players - 1)
         love_letter.save()
+        ll[nr_game] = LoveLetterGame(user.game_nr)
     else:
         if get_players.count() == 1:
             player1 = LoveLetter.objects.get(game_nr=nr_game).player1
             player2 = request.session.get('user_id')
+            ll[nr_game].players_curr_cards[player2] = []
+            ll[nr_game].players_discarded_cards[player2] = []
+            ll[nr_game].players.append(player2)
             if nr_players == 2:
                 try:
                     user1 = Users.objects.filter(user_nr=player1)[0]
@@ -122,6 +155,9 @@ def get_players_loveletter(request):
             player1 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player1')
             player2 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player2')
             player3 = request.session.get('user_id')
+            ll[nr_game].players_curr_cards[player3] = []
+            ll[nr_game].players_discarded_cards[player3] = []
+            ll[nr_game].players.append(player3)
             if nr_players == 3:
                 state = 'playing'
                 user1 = Users.objects.get(user_nr=player1)
@@ -138,6 +174,9 @@ def get_players_loveletter(request):
             player2 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player2')
             player3 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player3')
             player4 = request.session.get('user_id')
+            ll[nr_game].players_curr_cards[player4] = []
+            ll[nr_game].players_discarded_cards[player4] = []
+            ll[nr_game].players.append(player4)
             state = 'playing'
             user1 = Users.objects.get(user_nr=player1)
             user1.state = 'playing'
@@ -160,10 +199,11 @@ def get_players_loveletter(request):
 
     template = loader.get_template('waiting_loveletter.html')
     context = {
-        'x': LoveLetter.objects.get(game_nr=nr_game, state='waiting').miss_pl,
+        'x': LoveLetter.objects.get(game_nr=nr_game).miss_pl,
         'nr': nr_players,
         'gameid': nr_game,
-        'userid': request.session.get("user_id")
+        'userid': request.session.get("user_id"),
+        'game': ll[nr_game]
     }
     return HttpResponse(template.render(context, request))
 
@@ -179,32 +219,75 @@ def waiting_loveletter(request):
 def play_loveletter(request):
     template = loader.get_template('playloveletter.html')
     user = Users.objects.get(user_nr=request.session.get('user_id'))
+    card_nr = ll[user.game_nr].get_new_card(user.user_nr)
     nr_tokens = 7
-    if user.nr_players == 3:
-        nr_tokens = 5
-    elif user.nr_players == 4:
-        nr_tokens = 4
+    player1 = LoveLetter.objects.get(game_nr=user.game_nr).player1
+    player2 = LoveLetter.objects.get(game_nr=user.game_nr).player2
     context = {
         'nr_players': user.nr_players,
-        'nr_tokens': nr_tokens,
-        'tokens': 0
+        'tokens': 0,
+        'card_nr': card_nr,
+        'nr_cards': range(16 - user.nr_players),
+        'user': request.session.get('user_id'),
+        'player1': player1,
+        'player2': player2,
     }
+    if user.nr_players == 3:
+        nr_tokens = 5
+        context['player3'] = LoveLetter.get(game_nr=user.game_nr).player3
+    elif user.nr_players == 4:
+        nr_tokens = 4
+        context['player3'] = LoveLetter.get(game_nr=user.game_nr).player3
+        context['player4'] = LoveLetter.get(game_nr=user.game_nr).player4
+    context['nr_tokens'] = nr_tokens
     return HttpResponse(template.render(context, request))
-
-
-def test(request):
-    template = loader.get_template('test.html')
-    return HttpResponse(template.render({}, request))
 
 
 def checking_pl(request):
     miss_pl = LoveLetter.objects.get(game_nr=request.GET.get('game_id')).miss_pl
     if miss_pl == 0:
-        ll = LoveLetter.objects.get(game_nr=request.GET.get('game_id'))
-        ll.state = 'playing'
-        ll.save()
+        love_l = LoveLetter.objects.get(game_nr=request.GET.get('game_id'))
+        love_l.state = 'playing'
+        love_l.save()
     response = miss_pl
-    return HttpResponse(simplejson.dumps(response), mimetype.MimeType("text", None, None, None))
+    return HttpResponse(simplejson.dumps(response))
+
+
+def draw_card(request):
+    user = str(request.GET.get('user'))
+    game_id = Users.objects.get(user_nr=user).game_nr
+    if ll[game_id].action == user:
+        card_nr = ll[game_id].get_new_card(user)
+    else:
+        card_nr = 0
+    return HttpResponse(json.dumps(card_nr), mimetype.MimeType("text", None, None, None))
+
+
+def update_game(request):
+    src = request.GET.get('src')
+    user = request.GET.get('user')
+    game_id = Users.get(user_nr=user).game_nr
+    ll[game_id].players_discarded_cards[user].append(src)
+    ll[game_id].action = str(user)
+
+
+def update_discarded(request):
+    user = str(request.GET.get('user'))
+    nr_discarded = int(request.GET.get('player1'))
+    player1 = ''
+    game_id = Users.objects.get(user_nr=user).game_nr
+    for x in ll[game_id].players:
+        if x != user:
+            player1 = x
+            break
+    discarded = len(ll[game_id].players_discarded_cards[player1])
+    if discarded > nr_discarded:
+        response = []
+        for x in range(nr_discarded, discarded):
+            response.append(ll[game_id].players_discarded_cards[player1])
+    else:
+        response = 0
+    return HttpResponse(json.dumps(response))
 
 
 def game_table(request):
@@ -222,7 +305,7 @@ def game_table(request):
                     user.nr_players = 0
                     user.game_name = ''
                     user.save()
-        # if games.game_nr == 'll1': #  or games.game_nr == 'll2':
-        #    games.delete()
+        # if games.game_nr == 'll1' or games.game_nr == 'll2':
+        #  games.delete()
     template = loader.get_template("game's table.html")
     return HttpResponse(template.render(context, request))

@@ -1,0 +1,33 @@
+
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+</head>
+    <div id="2.player1">
+           <span>Player 1</span>
+           <div class="discarded"></div>
+       </div>
+       <div id="cards">
+           <img src="{% static 'Love letter/cardback.png' %}" class="cards" id="deck" >
+       </div>
+       <div id="2.you">
+           <div class="discarded"></div>
+           <span>You<br></span>
+           {% if card_nr == 1 %}
+           <img src="{% static 'Love letter/guard.jpg'%}" class="cards">
+           {% elif card_nr == 2 %}
+           <img src="{% static 'Love letter/priest.jpeg' %}" class="cards">
+           {% elif card_nr == 3 %}
+           <img src="{% static 'Love letter/baron.jpg' %}" class="cards">
+           {% elif card_nr == 4 %}
+           <img src="{% static 'Love letter/handmaid.png' %}" class="cards">
+           {% elif card_nr == 5 %}
+           <img src="{% static 'Love letter/prince.webp' %}" class="cards">
+           {% elif card_nr == 6 %}
+           <img src="{% static 'Love letter/king.jpeg' %}" class="cards">
+           {% elif card_nr == 7 %}
+           <img src="{% static 'Love letter/countess.jpeg' %}" class="cards">
+           {% elif card_nr == 8 %}
+           <img src="{% static 'Love letter/princess.png' %}" class="cards">
+           {% endif %}
+       </div>

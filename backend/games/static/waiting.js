@@ -1,4 +1,4 @@
-myInterval = setInterval(check_pl, '5000');
+myInterval = setInterval(check_pl, '2000');
 
  function check_pl() {
      $(document).ready(function() {

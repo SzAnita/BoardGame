@@ -3,8 +3,20 @@
 <head>
     {% load static %}
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Playing Love Letter</title>
     <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        var guard = "{% static 'Love letter/guard.jpg'%}";
+        var priest = "{% static 'Love letter/priest.jpeg' %}";
+        var baron = "{% static 'Love letter/baron.jpg' %}";
+        var handmaid = "{% static 'Love letter/handmaid.png' %}";
+        var prince = "{% static 'Love letter/prince.webp' %}";
+        var king = "{% static 'Love letter/king.jpeg' %}";
+        var countess = "{% static 'Love letter/countess.jpeg' %}";
+        var princess = "{% static 'Love letter/princess.png' %}";
+    </script>
 </head>
 <body>
    <ul id="ul-navbar">
@@ -24,20 +36,24 @@
    </ul>
    <div class="box-body">
 
-       <span>Number of players: {{ nr_players }}</span>
-       <span>Number of tokens necessary to win: {{ nr_tokens }}</span>
-       <span>Your tokens: {{ tokens }}</span>
-       {% if nr_players == 2 %}
-       <div id="2.player1">
-           <img src="{{ card }}">
-           <div class="discarded"></div>
-       </div>
-       <div id="cards"></div>
-       <div id="2.you">
-           <div class="discarded"></div>
-           <img src="{{ mycard1 }}">
-       </div>
+       <span>Number of players: {{ nr_players }}<br></span>
+       <span>Number of tokens necessary to win: {{ nr_tokens }}<br></span>
+       <span>Your tokens: {{ tokens }}<br></span>
+       <span id="nr_pl" class="{{ nr_players }}"></span>
+       <span id="card_nr" class="{{ card_nr }}"></span>
+       <span id="user" class="{{ user }}"></span>
+       <span id="player1" class="{{ player1 }}"></span>
+       <span id="player2" class="{{ player2 }}"></span>
 
+           <div id="cards">
+               {% for x in nr_cards %}
+               <button type="button" onclick="draw_card()"><img src="{% static 'Love letter/cardback.png' %}" class="deck" id="{{ x }}" ></button>
+               {% endfor %}
+               <br>
+           </div>
    </div>
+    <script type="text/javascript" src="{% static 'Love letter/loveletter.js' %}"></script>
 </body>
+
+
 </html>

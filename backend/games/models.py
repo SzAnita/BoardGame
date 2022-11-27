@@ -21,3 +21,8 @@ class LoveLetter(models.Model):
     miss_pl = models.IntegerField()
 
 
+class LoveLetterGame(models.Model):
+    game_nr = models.CharField(max_length=255, primary_key=True)
+    round_nr = models.IntegerField()
+    turn = models.CharField(max_length=255)
+

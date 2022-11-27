@@ -10,7 +10,9 @@ urlpatterns = [
     path('loveletter/waiting/', views.waiting_loveletter, name='waiting'),
     path('loveletter/playing/', views.play_loveletter, name='playing'),
     path('loveletter/checking_pl', views.checking_pl, name='checking_pl'),
+    path('loveletter/playing/draw_card', views.draw_card, name='draw_card'),
+    path('loveletter/playing/update_game', views.update_game, name='update_game'),
+    path('loveletter/playing/get_discarded', views.update_discarded, name='get_discarded'),
     path('games_table/', views.game_table, name='games_table'),
     path('kingdomino', views.kingdomino, name='kingdomino'),
-    path('test', views.test, name='test')
 ]

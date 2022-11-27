@@ -95,6 +95,21 @@ ul {
 .cards {
 	height: 100px;
 }
+.deck {
+	position: absolute;
+	left: 40%;
+	height: 100px;
+}
+#discarded_you {
+    height: 105px;
+    width: 35%;
+}
+#my_cards {
+    width: 150px;
+}
+#cards {
+    height: 100px;
+}
 input {
 	font-size: 0.95em;
 	margin: 0.55em 0;
