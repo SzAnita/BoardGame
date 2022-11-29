@@ -100,9 +100,10 @@ ul {
 	left: 40%;
 	height: 100px;
 }
-#discarded_you {
+#discarded_you, .discarded {
     height: 105px;
     width: 35%;
+    padding: 10px;
 }
 #my_cards {
     width: 150px;

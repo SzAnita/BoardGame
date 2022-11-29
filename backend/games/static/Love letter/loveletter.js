@@ -46,10 +46,11 @@ function draw_card() {
                 $('#my_cards').append($card);
                 $('#msg').remove();
             } else {
-                $('.box_body').append("<span id='msg'>It's not your turn</span>");
+                $('.box_body').append("<span id='msg'>You can't draw a card now</span>");
             }
         }
     })
+    $('#my_cards img').attr('draggable', 'true');
     x++;
 }
 function allowDrop(ev) {
@@ -61,15 +62,20 @@ function drag(ev) {
 function drop(ev) {
   ev.preventDefault();
   var data = ev.dataTransfer.getData("text");
+  ev.target.appendChild(document.getElementById(data));
+  $('.box-body').append($(data).attr('src'));
   $.ajax ({
     type: 'GET',
     url: 'update_game',
     data: {
         'src': $(data).attr('src'),
         'user': $('#user').attr('class')
+    },
+    success: function() {
+       $('.box_body').append('<p>Ajax request succeeded</p>');
     }
   })
-  ev.target.appendChild(document.getElementById(data));
+  $('#my_cards img').attr('draggable', 'false');
 }
 
 $(document).ready(function() {
@@ -79,7 +85,7 @@ $(document).ready(function() {
     if ($nr_players == "2") {
         $("#cards").before('<div id="2_player1"><span>Player 1</span><div class="discarded"></div></div>');
         $img_src = get_card_src(card_nr);
-        $you = $('<div id="2_you"><div id="discarded_you ondrop="drop(event)" ondragover="allowDrop(event)"></div><span>You<br></span></div>');
+        $you = $('<div id="2_you"><div id="discarded_you" ondrop="drop(event)" ondragover="allowDrop(event)"></div><span>You<br></span></div>');
         $('.box-body').append($you);
         $div = $('<div id="my_cards"></div>');
         $card = $('<img>');
@@ -88,7 +94,7 @@ $(document).ready(function() {
             'id': 'card'+card_id,
             'height': '100px',
             'class': card_nr,
-            'draggable': "true",
+            'draggable': "false",
             'ondragstart': 'drag(event)'
         });
         card_id++;
@@ -101,7 +107,7 @@ function check_discarded() {
     $(document).ready(function() {
         $nr_players = $('#nr_pl').attr('class');
 
-        var player1_discarded = $('#2_player1.discarded img').length;
+        var player1_discarded = $('#2_player1 .discarded img').length;
         $.ajax ({
             type: 'GET',
             url: 'get_discarded',
@@ -112,10 +118,15 @@ function check_discarded() {
             success: function(data) {
                 if (data != "0") {
                     const obj = JSON.parse(data);
-                    for (let x in obj) {
+                    /*for (let x in obj) {
                         var card = $("<img>").attr('src', obj[x]);
-                        $('#2_player1').append(card);
-                    }
+                        $('#2_player1 .discarded').append(card);
+                    }*/
+                    $('#2_player1 .discarded').append(data);
+                } else if(data == "0") {
+                    $('.box-body').append("There's nothing to update");
+                } else {
+                    $('.box-body').append("I don't know what's returned");
                 }
             }
         })
