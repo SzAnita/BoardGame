@@ -160,7 +160,7 @@ def get_players_loveletter(request):
             player1 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player1')
             player2 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player2')
             player3 = request.session.get('user_id')
-            ll[nr_game].players[player3] =  Player(player3)
+            ll[nr_game].players[player3] = Player(player3)
             ll[nr_game].players[player2].next = player3
             if nr_players == 3:
                 state = 'playing'
@@ -272,6 +272,7 @@ def draw_card(request):
 def update_game(request):
     src = request.GET.get('src')
     user = str(request.GET.get('user'))
+    card = int(request.GET.get('class'))
     game_id = Users.objects.get(user_nr=user).game_nr
     ll[game_id].players[user].cards['discarded'].append(src)
     ll[game_id].action = ll[game_id].players[user].next
@@ -293,7 +294,6 @@ def update_discarded(request):
         response = []
         for x in range(nr_discarded, discarded):
             response.append(ll[game_id].players[player1].cards['discarded'][x])
-        response.append(True)
     else:
         response = nr_discarded - discarded
     return HttpResponse(json.dumps(response))
@@ -315,6 +315,6 @@ def game_table(request):
                     user.game_name = ''
                     user.save()
         # if games.game_nr == 'll1' or games.game_nr == 'll2':
-        #  games.delete()
+         #   games.delete()
     template = loader.get_template("game's table.html")
     return HttpResponse(template.render(context, request))

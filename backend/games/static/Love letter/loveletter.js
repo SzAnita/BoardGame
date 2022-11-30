@@ -21,6 +21,32 @@ function get_card_src(card_nr) {
     }
 }
 
+function card_action(card_nr) {
+    if (card_nr == '1') {
+        var player = prompt("Choose a player. Remember if the chosen player has the card you will choose later s/he will be eliminated from this round");
+        var card = prompt("Choose a card by writing a number from 2 to 8. Remember 2 is priest, 2 is baron, 4 is handmaid, 5 is prince, 6 is king, 7 is countess and 8 is princess");
+        var success = card_action(card);
+        if( success == 0) {
+            alert("The player didn't have the chosen card");
+        } else {
+            alert("The player has the chosen card, and s/he is eliminated");
+        }
+        return 1;
+    } else if(card_nr == '2') {
+        var player = prompt("Choose a player whose cards you want to see:");
+        $.ajax ({
+            type: 'GET',
+            url: 'get_cards',
+            data: {
+                'player': $('#'+player).attr('class')
+            }
+        })
+    }
+    else {
+        return 0;
+    }
+}
+
 function draw_card() {
     $('#'+x).remove();
     var id = $('#user').attr('class');
@@ -63,13 +89,14 @@ function drop(ev) {
   ev.preventDefault();
   var data = ev.dataTransfer.getData("text");
   ev.target.appendChild(document.getElementById(data));
-  $('.box-body').append($(data).attr('src'));
+
   $.ajax ({
     type: 'GET',
     url: 'update_game',
     data: {
-        'src': $(data).attr('src'),
-        'user': $('#user').attr('class')
+        'src': $('#'+data).attr('src'),
+        'user': $('#user').attr('class'),
+        'card_nr':$('#'+data).attr('class')
     },
     success: function() {
        $('.box_body').append('<p>Ajax request succeeded</p>');
@@ -118,15 +145,15 @@ function check_discarded() {
             success: function(data) {
                 if (data != "0") {
                     const obj = JSON.parse(data);
-                    /*for (let x in obj) {
-                        var card = $("<img>").attr('src', obj[x]);
+                    for (let x in obj) {
+                        var card = $("<img>");
+                        card.attr({
+                        'src': obj[x]),
+                        'height': '100px',
+                        })
                         $('#2_player1 .discarded').append(card);
-                    }*/
+                    }
                     $('#2_player1 .discarded').append(data);
-                } else if(data == "0") {
-                    $('.box-body').append("There's nothing to update");
-                } else {
-                    $('.box-body').append("I don't know what's returned");
                 }
             }
         })
