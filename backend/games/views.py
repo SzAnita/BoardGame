@@ -9,7 +9,7 @@ from .models import Users, LoveLetter
 
 
 class Player:
-    def __init__(self, pl_id):
+    def __init__(self, pl_id, start):
         self.id = pl_id
         self.cards = {
             'curr': [],
@@ -18,6 +18,11 @@ class Player:
         self.draw_card = True
         self.discard_card = False
         self.next = ''
+        self.eliminate = False
+        self.begin = start
+        self.handmaid = False
+        self.msg = ''
+        self.card_sel = ''
 
 
 class LoveLetterGame:
@@ -26,7 +31,7 @@ class LoveLetterGame:
         self.cards = [1, 1, 1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8]
         self.game = LoveLetter.objects.get(game_nr=self.game_id)
         self.players = {
-            self.game.player1: Player(self.game.player1)
+            self.game.player1: Player(self.game.player1, True)
         }
         self.action = self.players[self.game.player1].id
 
@@ -137,7 +142,7 @@ def get_players_loveletter(request):
         if get_players.count() == 1:
             player1 = LoveLetter.objects.get(game_nr=nr_game).player1
             player2 = request.session.get('user_id')
-            ll[nr_game].players[player2] = Player(player2)
+            ll[nr_game].players[player2] = Player(player2, False)
             ll[nr_game].players[player1].next = player2
             if nr_players == 2:
                 try:
@@ -160,7 +165,7 @@ def get_players_loveletter(request):
             player1 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player1')
             player2 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player2')
             player3 = request.session.get('user_id')
-            ll[nr_game].players[player3] = Player(player3)
+            ll[nr_game].players[player3] = Player(player3, False)
             ll[nr_game].players[player2].next = player3
             if nr_players == 3:
                 state = 'playing'
@@ -179,7 +184,7 @@ def get_players_loveletter(request):
             player2 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player2')
             player3 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player3')
             player4 = request.session.get('user_id')
-            ll[nr_game].players[player4] = Player(player4)
+            ll[nr_game].players[player4] = Player(player4, False)
             ll[nr_game].players[player3].next = player4
             ll[nr_game].players[player4].next = player1
             state = 'playing'
@@ -228,23 +233,53 @@ def play_loveletter(request):
     nr_tokens = 7
     player1 = LoveLetter.objects.get(game_nr=user.game_nr).player1
     player2 = LoveLetter.objects.get(game_nr=user.game_nr).player2
+    player3 = LoveLetter.objects.get(game_nr=user.game_nr).player3
+    player4 = LoveLetter.objects.get(game_nr=user.game_nr).player4
+    players = {
+        'user': request.session.get('user_id')
+    }
     context = {
         'nr_players': user.nr_players,
         'tokens': 0,
         'card_nr': card_nr,
         'nr_cards': range(16 - user.nr_players),
-        'user': request.session.get('user_id'),
-        'player1': player1,
-        'player2': player2,
     }
-    if user.nr_players == 3:
+    if user.nr_players == 2:
+        if player1 == request.session.get('user_id'):
+            players['player1'] = player2
+        else:
+            players['player1'] = player1
+    elif user.nr_players == 3:
         nr_tokens = 5
-        context['player3'] = LoveLetter.get(game_nr=user.game_nr).player3
+        if player1 == request.session.get('user_id'):
+            players['player1'] = player2
+            players['player2'] = player3
+        elif player2 = request.session.get('user_id'):
+            players['player1'] = player1
+            players['player2'] = player3
+        else:
+            players['player1'] = player1
+            players['player2'] = player2
     elif user.nr_players == 4:
         nr_tokens = 4
-        context['player3'] = LoveLetter.get(game_nr=user.game_nr).player3
-        context['player4'] = LoveLetter.get(game_nr=user.game_nr).player4
+        if player1 == request.session.get('user_id'):
+            players['player1'] = player2
+            players['player2'] = player3
+            players['player3'] = player4
+        elif player2 = request.session.get('user_id'):
+            players['player1'] = player1
+            players['player2'] = player3
+            players['player3'] = player4
+        elif player3 = request.session.get('user_id'):
+            players['player1'] = player1
+            players['player2'] = player2
+            players['player3'] = player4
+        else:
+            players['player1'] = player1
+            players['player2'] = player2
+            players['player3'] = player3
     context['nr_tokens'] = nr_tokens
+    context['players'] = players
     return HttpResponse(template.render(context, request))
 
 
@@ -261,8 +296,9 @@ def checking_pl(request):
 def draw_card(request):
     user = str(request.GET.get('user'))
     game_id = Users.objects.get(user_nr=user).game_nr
-    if ll[game_id].action == user and ll[game_id].players[user].draw_card == True:
+    if (ll[game_id].action == user and ll[game_id].players[user].draw_card == True) or ll[game_id].players[user].msg == 'prince':
         card_nr = ll[game_id].get_new_card(user)
+        ll[game_id].players[user].msg == ''
     else:
         card_nr = 0
     ll[game_id].players[user].draw_card = False
@@ -277,27 +313,124 @@ def update_game(request):
     ll[game_id].players[user].cards['discarded'].append(src)
     ll[game_id].action = ll[game_id].players[user].next
     ll[game_id].players[ll[game_id].action].draw_card = True
+    if ll[game_id].players[user].handmaid == True:
+        ll[game_id].players[user].handmaid = False
     return HttpResponse(json.dumps(src))
 
 
 def update_discarded(request):
     user = str(request.GET.get('user'))
-    nr_discarded = int(request.GET.get('player1'))
-    player1 = ''
+    nr_discarded = int(request.GET.get('player1_discarded'))
+    player1 = str(request.GET.get('player1'))
     game_id = Users.objects.get(user_nr=user).game_nr
-    for x in ll[game_id].players.keys():
-        if x != user:
-            player1 = x
-            break
+    Player p = ll[game_id].players[user]
+    response = []   
     discarded = len(ll[game_id].players[player1].cards['discarded'])
     if discarded > nr_discarded:
-        response = []
+        cards = []
         for x in range(nr_discarded, discarded):
-            response.append(ll[game_id].players[player1].cards['discarded'][x])
+            cards.append(ll[game_id].players[player1].cards['discarded'][x])
+        response.append(cards)
     else:
-        response = nr_discarded - discarded
+        response.append(nr_discarded - discarded)
+    response.append(p.msg)
+    response.append(p.card_sel)
+    if p.msg != 'prince':
+        p.msg = ''
+    p.card_sel = ''
+    if p.eliminate == True and request.session.GET.get('eliminateyou') == 'false':
+        response.append('eliminate')
+    else if p.eliminate == False:
+        response.append('0')
+    else:
+        response.append('tie')
+        p.eliminate = False
+    if p.msg == 'king':
+        response.append(p.cards['curr'][0])
     return HttpResponse(json.dumps(response))
 
+def protected_players(request):
+    user = request.session.get('user_id')
+    game_id = Users.objects.get(user_nr=user).game_nr
+    response = 0
+    for x in ll[game_id].players:
+        if x != user and ll[game_id].players[x].handmaid == False:
+            response = 1
+            break
+    return HttpResponse(json.dumps(response))
+
+def curr_pl():
+    user = request.session.get('user_id')
+    game_id = Users.objects.get(user_nr=user).game_nr
+    if ll[game_id].action == user:
+        return HttpResponse(json.dumps(1))
+    else:
+        return HttpResponse(json.dumps(0))
+
+def guard(request):
+    player = str(request.GET.get('player'))
+    card = int(request.GET.get('card'))
+    user = str(request.GET.get('user'))
+    game_id = Users.objects.get(user_nr=user).game_nr
+    player_card = ll[game_id].players[player].cards['curr']
+    hit = False
+    if player_card == card and ll[game_id].players[player].handmaid == False and ll[game_id].players[player].eliminate == False:
+        ll[game_id].players[player].eliminate = True
+        ll[game_id].players[player].msg = 'guard'
+        ll[game_id].players[player].card_sel = str(card)
+        ll[game_id].players[player].cards['discarded'].append(x)
+        hit = True
+    return HttpResponse(json.dumps(hit))
+
+def priest(request):
+    player = str(request.GET.get('player'))
+    user = str(request.GET.get('user'))
+    game_id = Users.objects.get(user_nr=user).game_nr
+    player_card = ll[game_id].players[player].cards['curr']
+    return HttpResponse(json.dumps(player_card))
+
+def baron(request):
+    player = str(request.GET.get('player'))
+    user = str(request.GET.get('user'))
+    game_id = Users.objects.get(user_nr=user).game_nr
+    player_card = ll[game_id].players[player].cards['curr']
+    you_card = ll[game_id].players[user].cards['curr']
+    response = []
+    if player_card < you_card and ll[game_id].players[player].handmaid == False and ll[game_id].players[player].eliminate == False:
+        ll[game_id].players[player].eliminate = True
+        response.append(True, player_card)
+    elif you_card < player_card and ll[game_id].players[player].handmaid == False and ll[game_id].players[player].eliminate == False:
+        ll[game_id].players[user].eliminate = True
+        response.append(False, player_card)
+    else:
+        ll[game_id].players[player] = 'tie'
+    return HttpResponse(json.dumps(response))
+
+def handmaid(request):
+    user = request.session.get('user_id')
+    game_id = Users.objects.get(user_nr=user).game_nr
+    ll[game_id].players[user].handmaid = True
+
+def prince(request):
+    user = request.session.get('user_id')
+    game_id = Users.objects.get(user_nr=user).game_nr
+    player = request.session.GET.get('player')
+    if player != user and ll[game_id].players[player].handmaid == False and ll[game_id].players[player].eliminate == False:
+        ll[game_id].players[player].msg = "prince"
+
+def king(request):
+    player = request.session.GET.get('player')
+    my_card = int(request.session.GET.get('my_card'))
+    user = request.session.get('user_id')
+    game_id = Users.objects.get(user_nr=user).game_nr
+    Player p = ll[game_id].players[player]
+    player_card = 0
+    if p.handmaid == False and p.eliminate == False:
+        player_card = p.cards['curr'][0]
+        ll[game_id].players[user].cards['curr'][0] = player_card
+        p.cards['curr'][0] = my_card
+        p.msg = "king"
+    return HttpResponse(json.dumps(player_card))
 
 def game_table(request):
     context = {
