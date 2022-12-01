@@ -81,7 +81,7 @@ function card_action(card_nr) {
                     $('#'+player+' #eliminated').html('Eliminated');
                 }
             }
-        })
+        });
     } else if(card_nr == '2') {
         var player = prompt("Choose a player whose cards you want to see:");
         $.ajax ({
@@ -94,7 +94,7 @@ function card_action(card_nr) {
             success: function(data) {
                 alert(player+" has card "+data);
             }
-        })
+        });
     } else if(card_nr == '3' && protected_players() == '1') {
         var player = prompt("Choose a player with whom you want to compare cards:");
         $.ajax ({
@@ -103,20 +103,20 @@ function card_action(card_nr) {
             data: {
                 'player': player,
                 'user': $('#user').attr('class')
+            },
+            success: function(data) {
+                response = JSON.parse(data);
+                if(response[0] == true) {
+                    alert(player+" has card"+response[1]+" so you have eliminated"+player);
+                    $('#'+player+' #eliminated').attr('class', 'true');
+                    $('#'+player+' #eliminated').html('Eliminated');
+                } else if(response[0] == false) {
+                    alert(player+" has card"+response[1]+" so you have been eliminated by"+player);
+                    $('#'+player+' #eliminated').attr('class', 'true');
+                    $('#'+player+' #eliminated').html('Eliminated');
+                }
             }
-        }),
-        success: function(data) {
-            response = JSON.parse(data);
-            if(response[0] == true) {
-                alert(player+" has card"+response[1]+" so you have eliminated"+player);
-                $('#'+player+' #eliminated').attr('class', 'true');
-                $('#'+player+' #eliminated').html('Eliminated');
-            } else if(response[0] == false) {
-                alert(player+" has card"+response[1]+" so you have been eliminated by"+player);
-                $('#'+player+' #eliminated').attr('class', 'true');
-                $('#'+player+' #eliminated').html('Eliminated');
-            }
-        }
+        });
     } else if(card_nr == '4') {
         $.ajax ({
             type: 'GET',
