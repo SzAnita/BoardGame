@@ -442,6 +442,11 @@ def king(request):
         p.msg = "king"
     return HttpResponse(json.dumps(player_card))
 
+def princess(request):
+    user = request.session.get('user_id')
+    game_id = Users.objects.get(user_nr=user).game_nr
+    ll[game_id].players[user].eliminate = True
+    
 
 def game_table(request):
     context = {

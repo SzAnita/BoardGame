@@ -37,14 +37,15 @@
    </ul>
    <div class="box-body">
 
-       <span>Number of players: {{ nr_players }}<br></span>
-       <span>Number of tokens necessary to win: {{ nr_tokens }}<br></span>
-       <span>Your tokens: {{ tokens }}<br></span>
-       <span id="nr_pl" class="{{ nr_players }}"></span>
-       <span id="card_nr" class="{{ card_nr }}"></span>
-       <span id="user" class="{{ user }}"></span>
-       <span id="player1" class="{{ player1 }}"></span>
-       <span id="player2" class="{{ player2 }}"></span>
+        <span>Number of players: {{ nr_players }}<br></span>
+        <span>Number of tokens necessary to win: {{ nr_tokens }}<br></span>
+        <span>Your tokens: {{ tokens }}<br></span>
+        <span id="nr_pl" class="{{ nr_players }}"></span>
+        <span id="card_nr" class="{{ card_nr }}"></span>
+
+        {% for k, v in players.items %}
+            <span id="{{ k }}" class="{{ v }}">{{ k }}, {{ v }}</span>
+        {% endfor %}
 
            <div id="cards">
                {% for x in nr_cards %}

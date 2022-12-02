@@ -33,7 +33,7 @@ function protected_players() {
     return x;
 }
 
-function countess(card) {
+function countess_f(card) {
     countess = false;
     curr_card = $('#my_cards img').attr('class');
     if(card == '7' && (curr_card == '6' || curr_card == '5')) {
@@ -161,10 +161,12 @@ function card_action(card_nr) {
             }
         });
     } else if(card_nr == '8') {
-
-    }
-    else {
-        return 0;
+        $.ajax({
+            type: 'GET',
+            url: 'princess',
+        });
+        $('#eliminateyou').attr('class', 'true');
+        $('#eliminateyou').html('Eliminated');
     }
 }
 
@@ -180,7 +182,7 @@ function draw_card() {
         success: function(data) {
             countess = false;
             if (data == '7' || data == '5' || data == '6') {
-                countess = countess(data);
+                countess = countess_f(data);
             }
             if (data != "0") {
                 $img = get_card_src(data);
@@ -228,6 +230,7 @@ function drop(ev) {
                $('.box_body').append('<p>Ajax request succeeded</p>');
             }
         })
+        card_action($('#'+data).attr('class'));
         if ($('#'+data).attr('class') == '8') {
             $('#eliminateyou').attr('class') = 'true';
             $('#eliminateyou').html('Eliminated');
@@ -281,7 +284,7 @@ function check_discarded() {
                     for (let x in responses[0]) {
                         var card = $("<img>");
                         card.attr({
-                        'src': obj[x]),
+                        'src': response[0][x],
                         'height': '100px',
                         })
                         $('#Player1 .discarded').append(card);
