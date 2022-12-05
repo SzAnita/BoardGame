@@ -296,7 +296,8 @@ def checking_pl(request):
 def draw_card(request):
     user = str(request.GET.get('user'))
     game_id = Users.objects.get(user_nr=user).game_nr
-    if (ll[game_id].action == user and ll[game_id].players[user].draw_card) or ll[game_id].players[user].msg == 'prince':
+    if (ll[game_id].action == user and ll[game_id].players[user].draw_card) or ll[game_id].players[
+        user].msg == 'prince':
         card_nr = ll[game_id].get_new_card(user)
         ll[game_id].players[user].msg = ''
     else:
@@ -333,8 +334,10 @@ def update_discarded(request):
         response.append(cards)
     else:
         response.append(nr_discarded - discarded)
-    response.append(p.msg)
-    response.append(p.card_sel)
+    response.append(ll[game_id].players[user].action)
+    if ll[game_id].players[user].action == 0:
+        response.append(p.msg)
+        response.append(p.card_sel)
     if p.msg != 'prince':
         p.msg = ''
     p.card_sel = ''
@@ -370,19 +373,32 @@ def curr_pl(request):
         return HttpResponse(json.dumps(0))
 
 
-def guard(request):
+def guard1(request):
     player = str(request.GET.get('player'))
-    card = int(request.GET.get('card'))
-    user = str(request.GET.get('user'))
+    user = request.session.get('user_id')
     game_id = Users.objects.get(user_nr=user).game_nr
-    player_card = ll[game_id].players[player].cards['curr']
-    hit = False
-    if player_card == card and not ll[game_id].players[player].handmaid and not ll[game_id].players[player].eliminate:
+    ll[game_id].players[user].msg = player
+
+
+def guard2(request):
+    card = int(request.GET.get('card'))
+    user = request.session.get('user_id')
+    game_id = Users.objects.get(user_nr=user).game_nr
+    player = str(ll[game_id].players[user].msg)
+    if ll[game_id].players[player].cards['curr'][0] == card:
+        ll[game_id].players[user].msg = 'hit'
         ll[game_id].players[player].eliminate = True
         ll[game_id].players[player].msg = 'guard'
-        ll[game_id].players[player].card_sel = str(card)
-        ll[game_id].players[player].cards['discarded'].append(card)
-        hit = True
+    else:
+        ll[game_id].players[user].msg = 'miss'
+
+
+def guard3(request):
+    user = str(request.session.get('user_id'))
+    game_id = Users.objects.get(user_nr=user).game_nr
+    hit = 1
+    if ll[game_id].players[user].msg == 'miss':
+        hit = 0
     return HttpResponse(json.dumps(hit))
 
 
@@ -401,11 +417,13 @@ def baron(request):
     player_card = ll[game_id].players[player].cards['curr']
     you_card = ll[game_id].players[user].cards['curr']
     response = []
-    if player_card < you_card and not ll[game_id].players[player].handmaid and not ll[game_id].players[player].eliminate:
+    if player_card < you_card and not ll[game_id].players[player].handmaid and not ll[game_id].players[
+        player].eliminate:
         ll[game_id].players[player].eliminate = True
         response.append(True)
         response.append(player_card)
-    elif you_card < player_card and not ll[game_id].players[player].handmaid and not ll[game_id].players[player].eliminate:
+    elif you_card < player_card and not ll[game_id].players[player].handmaid and not ll[game_id].players[
+        player].eliminate:
         ll[game_id].players[user].eliminate = True
         response.append(False)
         response.append(player_card)
@@ -442,11 +460,12 @@ def king(request):
         p.msg = "king"
     return HttpResponse(json.dumps(player_card))
 
+
 def princess(request):
     user = request.session.get('user_id')
     game_id = Users.objects.get(user_nr=user).game_nr
     ll[game_id].players[user].eliminate = True
-    
+
 
 def game_table(request):
     context = {
