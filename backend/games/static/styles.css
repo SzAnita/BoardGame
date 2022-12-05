@@ -106,7 +106,7 @@ ul {
     padding: 10px;
 }
 #popup_form {
-    display: 'hidden';
+    display: 'none';
 }
 #my_cards {
     width: 150px;

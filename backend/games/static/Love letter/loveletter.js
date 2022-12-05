@@ -74,7 +74,7 @@ function card_action(card_nr) {
                 data: {
                     'player': player_id,
                     'card': card
-                }
+                },
                 success: function(data) {
                     $('[name=players]').hide();
                     $('[name=card]').hide();
@@ -248,6 +248,11 @@ function drop(ev) {
     var data = ev.dataTransfer.getData("text");
     ev.target.appendChild(document.getElementById(data));
     if(get_curr_pl() == true || $('#'+data).attr('class') == '8') {
+        card_action($('#'+data).attr('class'));
+        if ($('#'+data).attr('class') == '8') {
+            $('#eliminateyou').attr('class') = 'true';
+            $('#eliminateyou').html('Eliminated');
+        }
         $.ajax ({
             type: 'GET',
             url: 'update_game',
@@ -260,11 +265,6 @@ function drop(ev) {
                $('.box_body').append('<p>Ajax request succeeded</p>');
             }
         });
-        card_action($('#'+data).attr('class'));
-        if ($('#'+data).attr('class') == '8') {
-            $('#eliminateyou').attr('class') = 'true';
-            $('#eliminateyou').html('Eliminated');
-        }
     }
     $('#my_cards img').attr('draggable', 'false');
 }

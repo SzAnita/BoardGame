@@ -334,8 +334,11 @@ def update_discarded(request):
         response.append(cards)
     else:
         response.append(nr_discarded - discarded)
-    response.append(ll[game_id].players[user].action)
-    if ll[game_id].players[user].action == 0:
+    if ll[game_id].action == user:
+        response.append(1)
+    else:
+        response.append(0)
+    if ll[game_id].action != user:
         response.append(p.msg)
         response.append(p.card_sel)
     if p.msg != 'prince':
@@ -393,12 +396,15 @@ def guard2(request):
         ll[game_id].players[user].msg = 'miss'
 
 
-def guard3(request):
+def guard(request):
     user = str(request.session.get('user_id'))
     game_id = Users.objects.get(user_nr=user).game_nr
-    hit = 1
-    if ll[game_id].players[user].msg == 'miss':
-        hit = 0
+    player = str(request.session.GET.get('player'))
+    card = int(request.session.GET.get('card'))
+    hit = 0
+    if ll[game_id].players[player].cards['curr'][0] == card:
+        hit = 1
+        ll[game_id].players[player].card_sel = card
     return HttpResponse(json.dumps(hit))
 
 
@@ -412,7 +418,7 @@ def priest(request):
 
 def baron(request):
     player = str(request.GET.get('player'))
-    user = str(request.GET.get('user'))
+    user = request.session.get('user_id')
     game_id = Users.objects.get(user_nr=user).game_nr
     player_card = ll[game_id].players[player].cards['curr']
     you_card = ll[game_id].players[user].cards['curr']
@@ -420,15 +426,16 @@ def baron(request):
     if player_card < you_card and not ll[game_id].players[player].handmaid and not ll[game_id].players[
         player].eliminate:
         ll[game_id].players[player].eliminate = True
-        response.append(True)
+        response.append(1)
         response.append(player_card)
     elif you_card < player_card and not ll[game_id].players[player].handmaid and not ll[game_id].players[
         player].eliminate:
         ll[game_id].players[user].eliminate = True
-        response.append(False)
+        response.append(-1)
         response.append(player_card)
     else:
         ll[game_id].players[player] = 'tie'
+        response.append(0)
     return HttpResponse(json.dumps(response))
 
 
