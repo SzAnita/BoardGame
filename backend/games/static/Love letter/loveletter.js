@@ -60,7 +60,7 @@ function get_curr_pl() {
     return you;
 }
 
-function card_action(card_nr) {
+function card_action(card_nr, id) {
     if (card_nr == '1') {
         $('[name=players]').show();
         $('[name=cards]').show();
@@ -78,6 +78,7 @@ function card_action(card_nr) {
                 success: function(data) {
                     $('[name=players]').hide();
                     $('[name=card]').hide();
+                    alert("this is testing with returned data:" +data);
                     if (data == '0') {
                         alert(player+" didn't have card "+card);
                     } else if (data == '1') {
@@ -97,8 +98,7 @@ function card_action(card_nr) {
                 type: 'GET',
                 url: 'priest',
                 data: {
-                    'player': $('#'+player).attr('class'),
-                    'user': $('#user').attr('class')
+                    'player': player_id
                 },
                 success: function(data) {
                     $('[name=players]').hide();
@@ -166,6 +166,8 @@ function card_action(card_nr) {
     } else if(card_nr == '6') {                
         $('[name=players]').show();
         $('#get_player').click(function() {
+            var player_id = $('input[name=player]:checked').val();
+            var player = $('label[for='+player_id+']').text();
             $.ajax({
                 type: 'GET',
                 url: 'king',
@@ -248,7 +250,7 @@ function drop(ev) {
     var data = ev.dataTransfer.getData("text");
     ev.target.appendChild(document.getElementById(data));
     if(get_curr_pl() == true || $('#'+data).attr('class') == '8') {
-        card_action($('#'+data).attr('class'));
+        card_action($('#'+data).attr('class'), data);
         if ($('#'+data).attr('class') == '8') {
             $('#eliminateyou').attr('class') = 'true';
             $('#eliminateyou').html('Eliminated');

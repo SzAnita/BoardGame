@@ -49,12 +49,12 @@
 
            <div id="cards">
                {% for x in nr_cards %}
-               <img src="{% static 'Love letter/cardback.png' %}" class="deck" id="{{ x }}" onclick="draw_card()">
+               <img src="{% static 'Love letter/cardback.png' %}" class="deck" id="{{ x }}img" onclick="draw_card()">
                {% endfor %}
                <br>
            </div>
        <div id="popup_form">
-           <form id="guard_card">
+           <form id="guard_card" name="cards">
                <input type="radio" id="2" name="card" value="2">
                <label for="2">Priest</label><br>
                <input type="radio" id="3" name="card" value="3">

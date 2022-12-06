@@ -106,7 +106,7 @@ ul {
     padding: 10px;
 }
 #popup_form {
-    display: 'none';
+    display: none;
 }
 #my_cards {
     width: 150px;
@@ -133,8 +133,6 @@ input {
 h3, h4 {width: 100%;}
 p {font-size: 1em;}
 @media only screen and (max-width: 503px) {
-	.logo {width: 80px;}
-	#logo_right {display: none;}
 	ul {
 		display: flex;
 		justify-content: flex-start;
