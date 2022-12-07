@@ -420,7 +420,7 @@ def baron(request):
 
 
 def handmaid(request):
-    user = request.session.get('user_id')
+    user = str(request.session.get('user_id'))
     game_id = Users.objects.get(user_nr=user).game_nr
     ll[game_id].players[user].handmaid = True
 
@@ -428,7 +428,7 @@ def handmaid(request):
 def prince(request):
     user = request.session.get('user_id')
     game_id = Users.objects.get(user_nr=user).game_nr
-    player = request.session.GET.get('player')
+    player = str(request.session.GET.get('player'))
     if player != user and not ll[game_id].players[player].handmaid and not ll[game_id].players[player].eliminate:
         ll[game_id].players[player].msg = "prince"
 

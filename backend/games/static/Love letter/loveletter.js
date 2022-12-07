@@ -67,7 +67,8 @@ function card_action(card_nr, id) {
         //$('[name=cards]').show();
         $('#get_card').click(function(){
             var player_id = $('input[name=player]:checked').val();
-            var player = $('label[for='+player_id+']').text();
+            var player_nr = $('input[name=player]:checked').attr('id');
+            var player = $('label[for='+player_nr+']').text();
             var card = $('input[name=card]:checked').val();
             $.ajax({
                 type: 'GET',
@@ -98,7 +99,8 @@ function card_action(card_nr, id) {
         //$('[name=players]').show();
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
-            var player = $('label[for='+player_id+']').text();
+            var player_nr = $('input[name=player]:checked').attr('id');
+            var player = $('label[for='+player_nr+']').text();
             $.ajax ({
                 type: 'GET',
                 url: 'priest',
@@ -106,7 +108,6 @@ function card_action(card_nr, id) {
                     'player': player_id
                 },
                 success: function(data) {
-                    alert("Testing if guard was successful");
                     alert("this is testing with returned data:" +data);
                     alert("Testing if priest was successful");
                     //$('[name=players]').hide();
@@ -117,12 +118,15 @@ function card_action(card_nr, id) {
     } else if(card_nr == '3') {
         alert("This is card number3: "+card_nr);
         //$('[name=players]').show();
+        var player_id = $('input[name=player]:checked').val();
+        var player_nr = $('input[name=player]:checked').attr('id');
+        var player = $('label[for='+player_nr+']').html();
         $('#get_player').click(function() {
             $.ajax ({
                 type: 'GET',
                 url: 'baron',
                 data: {
-                    'player': player
+                    'player': player_id
                 },
                 success: function(data) {
                     alert("Testing if guard was successful");
@@ -162,7 +166,8 @@ function card_action(card_nr, id) {
         $('#get_player').before(me, label2);
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
-            var player = $('label[for='+player_id+']').text();
+            var player_nr = $('input[name=player]:checked').attr('id');
+            var player = $('label[for='+player_nr+']').text();
             if (player == 'me') {
                 $('#my_cards img').attr('draggable', 'true');
             }
@@ -182,7 +187,8 @@ function card_action(card_nr, id) {
         //$('[name=players]').show();
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
-            var player = $('label[for='+player_id+']').text();
+            var player_nr = $('input[name=player]:checked').attr('id');
+            var player = $('label[for='+player_nr+']').text();
             $.ajax({
                 type: 'GET',
                 url: 'king',
