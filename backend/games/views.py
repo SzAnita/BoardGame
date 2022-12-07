@@ -294,7 +294,7 @@ def checking_pl(request):
 
 
 def draw_card(request):
-    user = str(request.GET.get('user'))
+    user = str(request.session.get('user_id'))
     game_id = Users.objects.get(user_nr=user).game_nr
     if (ll[game_id].action == user and ll[game_id].players[user].draw_card) or ll[game_id].players[
         user].msg == 'prince':
@@ -376,26 +376,6 @@ def curr_pl(request):
         return HttpResponse(json.dumps(0))
 
 
-def guard1(request):
-    player = str(request.GET.get('player'))
-    user = request.session.get('user_id')
-    game_id = Users.objects.get(user_nr=user).game_nr
-    ll[game_id].players[user].msg = player
-
-
-def guard2(request):
-    card = int(request.GET.get('card'))
-    user = request.session.get('user_id')
-    game_id = Users.objects.get(user_nr=user).game_nr
-    player = str(ll[game_id].players[user].msg)
-    if ll[game_id].players[player].cards['curr'][0] == card:
-        ll[game_id].players[user].msg = 'hit'
-        ll[game_id].players[player].eliminate = True
-        ll[game_id].players[player].msg = 'guard'
-    else:
-        ll[game_id].players[user].msg = 'miss'
-
-
 def guard(request):
     user = str(request.session.get('user_id'))
     game_id = Users.objects.get(user_nr=user).game_nr
@@ -410,9 +390,9 @@ def guard(request):
 
 def priest(request):
     player = str(request.GET.get('player'))
-    user = str(request.GET.get('user'))
+    user = str(request.session.get('user_id'))
     game_id = Users.objects.get(user_nr=user).game_nr
-    player_card = ll[game_id].players[player].cards['curr']
+    player_card = ll[game_id].players[player].cards['curr'][0]
     return HttpResponse(json.dumps(player_card))
 
 
