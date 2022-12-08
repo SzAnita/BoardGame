@@ -79,7 +79,7 @@ function card_action(card_nr, id) {
                 success: function(data) {
                     //$('[name=players]').hide();
                     //$('[name=card]').hide();
-                    alert("Testing if guard was successful").
+                    alert("Testing if guard was successful");
                     alert("this is testing with returned data:" +data);
                     alert("Testing chosen player: "+player);
                     alert("Testing chosen card: "+card);
@@ -139,6 +139,8 @@ function card_action(card_nr, id) {
                         $('#'+player+' #eliminated').html('Eliminated');
                     } else if(data[0] == '0') {
                         alert("Both of you have the same cards");
+                    } else {
+                        alert("Data is not of type string");
                     }
                 }
             });

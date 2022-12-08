@@ -374,11 +374,12 @@ def curr_pl(request):
 def guard(request):
     user = str(request.session.get('user_id'))
     game_id = Users.objects.get(user_nr=user).game_nr
-    player = str(request.session.GET.get('player'))
-    card = int(request.session.GET.get('card'))
+    player = str(request.GET.get('player'))
+    card = int(request.GET.get('card'))
     hit = 0
     if ll[game_id].players[player].cards['curr'][0] == card:
         hit = 1
+        ll[game_id].players[player].msg = 'guard'
         ll[game_id].players[player].card_sel = card
     return HttpResponse(json.dumps(hit))
 
@@ -425,7 +426,7 @@ def handmaid(request):
 def prince(request):
     user = request.session.get('user_id')
     game_id = Users.objects.get(user_nr=user).game_nr
-    player = str(request.session.GET.get('player'))
+    player = str(request.GET.get('player'))
     if player != user and not ll[game_id].players[player].handmaid and not ll[game_id].players[player].eliminate:
         ll[game_id].players[player].msg = "prince"
     msg = "You've been successful"
@@ -435,7 +436,7 @@ def prince(request):
 
 
 def king(request):
-    player = request.session.GET.get('player')
+    player = request.GET.get('player')
     my_card = int(request.session.GET.get('my_card'))
     user = request.session.get('user_id')
     game_id = Users.objects.get(user_nr=user).game_nr
