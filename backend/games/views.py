@@ -9,7 +9,7 @@ from .models import Users, LoveLetter
 
 
 class Player:
-    def __init__(self, pl_id, start):
+    def __init__(self, pl_id):
         self.id = pl_id
         self.cards = {
             'curr': [],
@@ -19,10 +19,10 @@ class Player:
         self.discard_card = False
         self.next = ''
         self.eliminate = False
-        self.begin = start
         self.handmaid = False
         self.msg = ''
         self.card_sel = ''
+        self.tokens = 0
 
 
 class LoveLetterGame:
@@ -31,7 +31,7 @@ class LoveLetterGame:
         self.cards = [1, 1, 1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8]
         self.game = LoveLetter.objects.get(game_nr=self.game_id)
         self.players = {
-            self.game.player1: Player(self.game.player1, True)
+            self.game.player1: Player(self.game.player1)
         }
         self.action = self.players[self.game.player1].id
 
@@ -94,11 +94,6 @@ def loveletter(request):
     return HttpResponse(template.render({}, request))
 
 
-def kingdomino(request):
-    template = loader.get_template('kingdomino.html')
-    return HttpResponse(template.render({}, request))
-
-
 def loveletter_instructions(request):
     checks(request.session.get('user_id'))
     template = loader.get_template('instructions_loveletter.html')
@@ -142,7 +137,7 @@ def get_players_loveletter(request):
         if get_players.count() == 1:
             player1 = LoveLetter.objects.get(game_nr=nr_game).player1
             player2 = request.session.get('user_id')
-            ll[nr_game].players[player2] = Player(player2, False)
+            ll[nr_game].players[player2] = Player(player2)
             ll[nr_game].players[player1].next = player2
             if nr_players == 2:
                 try:
@@ -165,7 +160,7 @@ def get_players_loveletter(request):
             player1 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player1')
             player2 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player2')
             player3 = request.session.get('user_id')
-            ll[nr_game].players[player3] = Player(player3, False)
+            ll[nr_game].players[player3] = Player(player3)
             ll[nr_game].players[player2].next = player3
             if nr_players == 3:
                 state = 'playing'
@@ -184,7 +179,7 @@ def get_players_loveletter(request):
             player2 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player2')
             player3 = LoveLetter.objects.filter(game_nr=user.game_nr).values_list('player3')
             player4 = request.session.get('user_id')
-            ll[nr_game].players[player4] = Player(player4, False)
+            ll[nr_game].players[player4] = Player(player4)
             ll[nr_game].players[player3].next = player4
             ll[nr_game].players[player4].next = player1
             state = 'playing'
@@ -400,8 +395,8 @@ def baron(request):
     player = str(request.GET.get('player'))
     user = request.session.get('user_id')
     game_id = Users.objects.get(user_nr=user).game_nr
-    player_card = ll[game_id].players[player].cards['curr']
-    you_card = ll[game_id].players[user].cards['curr']
+    player_card = ll[game_id].players[player].cards['curr'][0]
+    you_card = ll[game_id].players[user].cards['curr'][0]
     response = []
     if player_card < you_card and not ll[game_id].players[player].handmaid and not ll[game_id].players[
         player].eliminate:
@@ -423,6 +418,8 @@ def handmaid(request):
     user = str(request.session.get('user_id'))
     game_id = Users.objects.get(user_nr=user).game_nr
     ll[game_id].players[user].handmaid = True
+    msg = "You'll be protected until your next turn"
+    return HttpResponse(json.dumps(msg))
 
 
 def prince(request):
@@ -431,6 +428,10 @@ def prince(request):
     player = str(request.session.GET.get('player'))
     if player != user and not ll[game_id].players[player].handmaid and not ll[game_id].players[player].eliminate:
         ll[game_id].players[player].msg = "prince"
+    msg = "You've been successful"
+    card = ll[game_id].players[player].cards['curr'][0]
+    return HttpResponse(json.dumps(msg))
+
 
 
 def king(request):
@@ -452,6 +453,8 @@ def princess(request):
     user = request.session.get('user_id')
     game_id = Users.objects.get(user_nr=user).game_nr
     ll[game_id].players[user].eliminate = True
+    msg = "You've been eliminated"
+    return HttpResponse(json.dumps(msg))
 
 
 def game_table(request):
@@ -469,7 +472,5 @@ def game_table(request):
                     user.nr_players = 0
                     user.game_name = ''
                     user.save()
-        # if games.game_nr == 'll1' or games.game_nr == 'll2':
-        #   games.delete()
     template = loader.get_template("game's table.html")
     return HttpResponse(template.render(context, request))

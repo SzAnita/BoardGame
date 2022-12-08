@@ -23,5 +23,4 @@ urlpatterns = [
     path('loveletter/playing/king', views.king, name='king'),
     path('loveletter/playing/princess', views.princess, name='princess'),
     path('games_table/', views.game_table, name='games_table'),
-    path('kingdomino', views.kingdomino, name='kingdomino'),
 ]

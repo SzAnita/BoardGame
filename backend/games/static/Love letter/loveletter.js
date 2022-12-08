@@ -62,10 +62,9 @@ function get_curr_pl() {
 
 function card_action(card_nr, id) {
     if (card_nr == '1') {
-        alert("This is card number1: "+card_nr);
         //$('[name=players]').show();
         //$('[name=cards]').show();
-        $('#get_card').click(function(){
+        $('#get_player').click(function(){
             var player_id = $('input[name=player]:checked').val();
             var player_nr = $('input[name=player]:checked').attr('id');
             var player = $('label[for='+player_nr+']').text();
@@ -95,7 +94,6 @@ function card_action(card_nr, id) {
             });
         });
     } else if(card_nr == '2') {
-        alert("This is card number2: "+card_nr);
         //$('[name=players]').show();
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
@@ -116,7 +114,6 @@ function card_action(card_nr, id) {
             });
         });
     } else if(card_nr == '3') {
-        alert("This is card number3: "+card_nr);
         //$('[name=players]').show();
         var player_id = $('input[name=player]:checked').val();
         var player_nr = $('input[name=player]:checked').attr('id');
@@ -147,14 +144,12 @@ function card_action(card_nr, id) {
             });
         });
     } else if(card_nr == '4') {
-        alert("This is card number4: "+card_nr);
         $.ajax ({
             type: 'GET',
             url: 'handmaid',
         });
     } else if(card_nr == '5') {
-        alert("This is card number5: "+card_nr);
-        $('[name=players]').show();
+        //$('[name=players]').show();
         var me = $('<input>');
         me.attr({
             'type': 'radio',
@@ -182,8 +177,7 @@ function card_action(card_nr, id) {
             me.remove();
             label2.remove();
         });
-    } else if(card_nr == '6') {
-        alert("This is card number6: "+card_nr);                
+    } else if(card_nr == '6') {                
         //$('[name=players]').show();
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
@@ -217,7 +211,6 @@ function card_action(card_nr, id) {
             });
         });
     } else if(card_nr == '8') {
-        alert("This is card number8: "+card_nr);
         $.ajax({
             type: 'GET',
             url: 'princess',
@@ -244,7 +237,7 @@ function draw_card() {
                 $card.attr({
                     'src': $img,
                     'id': 'card'+card_id,
-                    'height': '100px',
+                    'height': '125px',
                     'class': data,
                     'draggable': 'true',
                     'ondragstart': 'drag(event)'
@@ -307,7 +300,7 @@ $(document).ready(function() {
         $card.attr({
             'src': $img_src,
             'id': 'card'+card_id,
-            'height': '100px',
+            'height': '125px',
             'class': card_nr,
             'draggable': "false",
             'ondragstart': 'drag(event)'
@@ -315,7 +308,7 @@ $(document).ready(function() {
         card_id++;
         $div.append($card);
         $('#you').append($div);
-        var form1 = $('<form name="players" id="player"></form>');
+        var form1 = $('<form name="players" id="player">Choose a player:</form>');
         var player1_id = $('#player1').attr('class');
         var player1 = $('<input>');
         player1.attr({
@@ -354,7 +347,7 @@ function check_discarded() {
                         var card = $("<img>");
                         card.attr({
                         'src': response[0][x],
-                        'height': '100px',
+                        'height': '125px',
                         })
                         $('#Player1 .discarded').append(card);
                     }
