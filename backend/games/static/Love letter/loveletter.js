@@ -79,8 +79,6 @@ function card_action(card_nr, id) {
                 success: function(data) {
                     //$('[name=players]').hide();
                     //$('[name=card]').hide();
-                    alert("Testing if guard was successful");
-                    alert("this is testing with returned data:" +data);
                     alert("Testing chosen player: "+player);
                     alert("Testing chosen card: "+card);
                     if (data == '0') {
@@ -106,8 +104,6 @@ function card_action(card_nr, id) {
                     'player': player_id
                 },
                 success: function(data) {
-                    alert("this is testing with returned data:" +data);
-                    alert("Testing if priest was successful");
                     //$('[name=players]').hide();
                     alert(player+" has card "+data);
                 }
@@ -126,20 +122,20 @@ function card_action(card_nr, id) {
                     'player': player_id
                 },
                 success: function(data) {
-                    alert("Testing if guard was successful");
-                    alert("this is testing with returned data:" +data);
                     alert("Testing if baron was successful");
-                    if(data[0] == '1') {
+                    response = JSON.parse(data);
+                    if(response[0] == 1) {
                         alert(player+" has card "+data[1]+" so you have eliminated "+player);
                         $('#eliminate1').attr('class', 'true');
                         $('#eliminate1').html('Eliminated');
-                    } else if(data[0] == '-1') {
+                    } else if(response[0] == -1) {
                         alert(player+" has card"+data[1]+" so you have been eliminated by"+player);
                         $('#'+player+' #eliminated').attr('class', 'true');
                         $('#'+player+' #eliminated').html('Eliminated');
-                    } else if(data[0] == '0') {
+                    } else if(response[0] == 0) {
                         alert("Both of you have the same cards");
                     } else {
+                        alert(data);
                         alert("Data is not of type string");
                     }
                 }
@@ -193,9 +189,6 @@ function card_action(card_nr, id) {
                     'player': player_id
                 },
                 success: function(data) {
-                    alert("Testing the chosen player: "+player);
-                    alert("Testing if king was successful");
-                    alert("Testing data: "+data);
                     $('#my_cards img').remove();
                     $img = get_card_src(data);
                     $card = $('<img>');
@@ -278,7 +271,12 @@ function drop(ev) {
                 'user': $('#user').attr('class'),
                 'card_nr':$('#'+data).attr('class')
             },
-            success: function() {
+            success: function(data) {
+                response = JSON.parse(data)
+                if (response != 0) {
+                    var player = $('#data span .'+response).attr('id');
+                    alert(player+" has won");
+                }
                $('.box_body').append('<p>Ajax request succeeded</p>');
             }
         });
@@ -357,33 +355,34 @@ function check_discarded() {
                         $('#Player1 .discarded').append(card);
                     }
                 } 
-                if (response[1] == '0') {
-                    if (response[2] == 'guard') {
-                        alert("The current player chose to perform the effect of the card guard on you. S/He chose the card "+response[3]+", so you've been eliminated. Please discard your card.");
+                if (response[2] == 1) {
+                    if (response[3] == 'guard') {
+                        alert("The current player chose to perform the effect of the card guard on you. S/He chose the card "+response[4]+", so you've been eliminated. Please discard your card.");
                         $('#my_cards img').attr('draggable', 'true');
                         $('#eliminateyou').attr('class', 'true');
                         $('#eliminateyou').html('Eliminated');
-                    } else if (response[2] == 'priest') {
+                    } else if (response[3] == 'priest') {
                         alert("The current player performed the effect of the card priest on you.");
-                    } else if(response[2] == 'baron') {
-                        if(response[3] == 'eliminate') {
-                            alert("The current player performed the effect of the card baron on you, s/he had the card "+response[3]+" and you've been eliminated");
+                    } else if(response[3] == 'baron') {
+                        if(response[5] == 'eliminate') {
+                            alert("The current player performed the effect of the card baron on you, s/he had the card "+response[4]+" and you've been eliminated");
                             $('#eliminateyou').attr('class', 'true');
                             $('#eliminateyou').html('Eliminated');
-                        } else if(response[3] == '0') {
-                            alert("The current player performed the effect of the card baron on you, s/he had the card "+response[3]+" and you'd eliminated him/her");
+                            $('my_cards img').attr('draggable', 'true');
+                        } else if(response[5] == '0') {
+                            alert("The current player performed the effect of the card baron on you, s/he had the card "+response[4]+" and you'd eliminated him/her");
                             $('#eliminate1').attr('class', 'true');
                             $('#eliminate1').html('Eliminated');
                         } else {
                             alert("The current player performed the effect of the card baron on you, s/he had the card "+response[3]+" so neither of you'd been eliminated");
                         }
-                    } else if(response[1] == 'prince') {
+                    } else if(response[3] == 'prince') {
                         alert("The current player has chosen to perform the effect of the card prince on you. Please discard your card, and draw a new card");
                         $('#my_cards img').attr('draggable', 'true')
-                    } else if(response[1] == 'king') {
+                    } else if(response[3] == 'king') {
                         alert("The current player has chosen to perform on you the effect of the card king, so your cards have been traded");
-                        $img = get_card_src(response[4]);
-                        var card = "<img>";
+                        var img = get_card_src(response[4]);
+                        var card = $("<img>");
                         card.attr({
                             'src': $img,
                             'height': '100px',
@@ -394,8 +393,12 @@ function check_discarded() {
                         });
                         $('#my_cards').append(card);
                     }
+                    if (response[1] != 1) {
+                        alert("This round has ended. Please discard your card");
+                        $('#my_cards img').attr('draggable', 'true');
+                    }
                 }
             }
-        })
-    })
+        });
+    });
 }
