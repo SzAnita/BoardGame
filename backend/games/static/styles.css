@@ -67,14 +67,18 @@ ul {
 .games {
 	padding: 0.5em;
 }
+#games {
+	display: flex;
+	justify-content: center;
+}
 .menu{display: none;}
 #menu{display: none;}
 .box-body {
 	background-color: lightgoldenrodyellow;
-	width: 60%;
+	width: 100%;
 	margin: auto;
 	margin-top: 3.3em;
-	padding: 1em 3em;
+	
 	border-style: ridge;
 	border-color: lightgoldenrodyellow;
 	border-radius: 1em;

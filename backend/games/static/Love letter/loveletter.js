@@ -229,14 +229,10 @@ function draw_card() {
         type: 'GET',
         url: 'draw_card',
         success: function(data) {
-            countess = false;
-            if (data == '7' || data == '5' || data == '6') {
-                countess = countess_f(data);
-            }
             if (data != "0") {
                 $img = get_card_src(data);
-                $card = $('<img>');
-                $card.attr({
+                var card = $('<img>');
+                card.attr({
                     'src': $img,
                     'id': 'card'+card_id,
                     'height': '125px',
@@ -245,14 +241,17 @@ function draw_card() {
                     'ondragstart': 'drag(event)'
                 });
                 card_id++;
-                $('#my_cards').append($card);
-                
+                $('#my_cards').append(card);
             } 
+            countess = false;
+            if (data == '7' || data == '5' || data == '6') {
+                countess = countess_f(data);
+            }
             if (countess == true) {
                 alert("You have to discard the card countess");
             }
         }
-    })
+    });
     $('#my_cards img').attr('draggable', 'true');
     x++;
 }
@@ -267,14 +266,13 @@ function drop(ev) {
     var data = ev.dataTransfer.getData("text");
     ev.target.appendChild(document.getElementById(data));
     if(get_curr_pl() == true || $('#'+data).attr('class') == '8') {
-        card_action($('#'+data).attr('class'), data);
         if ($('#'+data).attr('class') == '8') {
             $('#eliminateyou').attr('class') = 'true';
             $('#eliminateyou').html('Eliminated');
         }
         $.ajax ({
             type: 'GET',
-            url: 'update_game',
+            url: 'discard_card',
             data: {
                 'src': $('#'+data).attr('src'),
                 'user': $('#user').attr('class'),
@@ -283,6 +281,11 @@ function drop(ev) {
             success: function() {
                $('.box_body').append('<p>Ajax request succeeded</p>');
             }
+        });
+        card_action($('#'+data).attr('class'), data);
+        $.ajax({
+            type: 'GET',
+            url: 'end_turn'
         });
     }
     $('#my_cards img').attr('draggable', 'false');
@@ -354,25 +357,25 @@ function check_discarded() {
                         $('#Player1 .discarded').append(card);
                     }
                 } 
-                if (response[1] != '') {
-                    if (response[1] == 'guard') {
-                        alert("The current player chose to perform the effect of the card guard on you. S/He chose the card "+response[2]+", so you've been eliminated. Please discard your card.");
+                if (response[1] == '0') {
+                    if (response[2] == 'guard') {
+                        alert("The current player chose to perform the effect of the card guard on you. S/He chose the card "+response[3]+", so you've been eliminated. Please discard your card.");
                         $('#my_cards img').attr('draggable', 'true');
                         $('#eliminateyou').attr('class', 'true');
                         $('#eliminateyou').html('Eliminated');
-                    } else if (response[1] == 'priest') {
+                    } else if (response[2] == 'priest') {
                         alert("The current player performed the effect of the card priest on you.");
-                    } else if(response[1] == 'baron') {
+                    } else if(response[2] == 'baron') {
                         if(response[3] == 'eliminate') {
-                            alert("The current player performed the effect of the card baron on you, s/he had the card "+response[2]+" and you've been eliminated");
+                            alert("The current player performed the effect of the card baron on you, s/he had the card "+response[3]+" and you've been eliminated");
                             $('#eliminateyou').attr('class', 'true');
                             $('#eliminateyou').html('Eliminated');
                         } else if(response[3] == '0') {
-                            alert("The current player performed the effect of the card baron on you, s/he had the card "+response[2]+" and you'd eliminated him/her");
+                            alert("The current player performed the effect of the card baron on you, s/he had the card "+response[3]+" and you'd eliminated him/her");
                             $('#eliminate1').attr('class', 'true');
                             $('#eliminate1').html('Eliminated');
                         } else {
-                            alert("The current player performed the effect of the card baron on you, s/he had the card "+response[2]+" so neither of you'd been eliminated");
+                            alert("The current player performed the effect of the card baron on you, s/he had the card "+response[3]+" so neither of you'd been eliminated");
                         }
                     } else if(response[1] == 'prince') {
                         alert("The current player has chosen to perform the effect of the card prince on you. Please discard your card, and draw a new card");

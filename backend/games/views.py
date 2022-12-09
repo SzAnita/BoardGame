@@ -237,13 +237,13 @@ def play_loveletter(request):
         'nr_players': user.nr_players,
         'tokens': 0,
         'card_nr': card_nr,
-        'nr_cards': range(16 - user.nr_players),
     }
     if user.nr_players == 2:
         if player1 == request.session.get('user_id'):
             players['player1'] = player2
         else:
             players['player1'] = player1
+        context['nr_cards'] = range(16 - user.nr_players - 4)
     elif user.nr_players == 3:
         nr_tokens = 5
         if player1 == request.session.get('user_id'):
@@ -255,6 +255,7 @@ def play_loveletter(request):
         else:
             players['player1'] = player1
             players['player2'] = player2
+        context['nr_cards'] = range(16 - user.nr_players - 1)
     elif user.nr_players == 4:
         nr_tokens = 4
         if player1 == request.session.get('user_id'):
@@ -273,6 +274,7 @@ def play_loveletter(request):
             players['player1'] = player1
             players['player2'] = player2
             players['player3'] = player3
+        context['nr_cards'] = range(16 - user.nr_players - 4)
     context['nr_tokens'] = nr_tokens
     context['players'] = players
     return HttpResponse(template.render(context, request))
@@ -291,8 +293,7 @@ def checking_pl(request):
 def draw_card(request):
     user = str(request.session.get('user_id'))
     game_id = Users.objects.get(user_nr=user).game_nr
-    if (ll[game_id].action == user and ll[game_id].players[user].draw_card) or ll[game_id].players[
-        user].msg == 'prince':
+    if (ll[game_id].action == user and ll[game_id].players[user].draw_card) or ll[game_id].players[user].msg == 'prince':
         card_nr = ll[game_id].get_new_card(user)
         ll[game_id].players[user].msg = ''
     else:
@@ -301,17 +302,24 @@ def draw_card(request):
     return HttpResponse(json.dumps(card_nr))
 
 
-def update_game(request):
+def discard_card(request):
     src = request.GET.get('src')
     user = str(request.GET.get('user'))
-    # card = int(request.GET.get('class'))
+    card = int(request.GET.get('class'))
     game_id = Users.objects.get(user_nr=user).game_nr
     ll[game_id].players[user].cards['discarded'].append(src)
+    ll[game_id].players[user].cards['curr'].pop(card)
+    return HttpResponse(json.dumps(src))
+
+
+def end_turn(request):
+    user = request.session.get('user_id')
+    game_id = Users.objects.get(user_nr=user).game_nr
     ll[game_id].action = ll[game_id].players[user].next
     ll[game_id].players[ll[game_id].action].draw_card = True
     if ll[game_id].players[user].handmaid:
         ll[game_id].players[user].handmaid = False
-    return HttpResponse(json.dumps(src))
+    return HttpResponse(json.dumps('success'))
 
 
 def update_discarded(request):
@@ -410,7 +418,7 @@ def baron(request):
         response.append(-1)
         response.append(player_card)
     else:
-        ll[game_id].players[player] = 'tie'
+        ll[game_id].players[player].eliminate = 'tie'
         response.append(0)
     return HttpResponse(json.dumps(response))
 
