@@ -195,7 +195,7 @@ function card_action(card_nr, id) {
                     $card.attr({
                         'src': $img,
                         'id': 'card'+card_id,
-                        'height': '100px',
+                        'height': '150px',
                         'class': data,
                         'draggable': 'true',
                         'ondragstart': 'drag(event)'
@@ -228,7 +228,7 @@ function draw_card() {
                 card.attr({
                     'src': $img,
                     'id': 'card'+card_id,
-                    'height': '125px',
+                    'height': '150px',
                     'class': data,
                     'draggable': 'true',
                     'ondragstart': 'drag(event)'
@@ -303,7 +303,7 @@ $(document).ready(function() {
         $card.attr({
             'src': $img_src,
             'id': 'card'+card_id,
-            'height': '125px',
+            'height': '150px',
             'class': card_nr,
             'draggable': "false",
             'ondragstart': 'drag(event)'
@@ -311,7 +311,7 @@ $(document).ready(function() {
         card_id++;
         $div.append($card);
         $('#you').append($div);
-        var form1 = $('<form name="players" id="player">Choose a player:</form>');
+        var form1 = $('<form name="players" id="player">Choose a player:<br></form>');
         var player1_id = $('#player1').attr('class');
         var player1 = $('<input>');
         player1.attr({
@@ -350,7 +350,7 @@ function check_discarded() {
                         var card = $("<img>");
                         card.attr({
                         'src': response[0][x],
-                        'height': '125px',
+                        'height': '150px',
                         })
                         $('#Player1 .discarded').append(card);
                     }
@@ -381,11 +381,12 @@ function check_discarded() {
                         $('#my_cards img').attr('draggable', 'true')
                     } else if(response[3] == 'king') {
                         alert("The current player has chosen to perform on you the effect of the card king, so your cards have been traded");
+                        $('#my_cards img').remove();
                         var img = get_card_src(response[4]);
                         var card = $("<img>");
                         card.attr({
                             'src': $img,
-                            'height': '100px',
+                            'height': '150px',
                             'draggable': 'false',
                             'ondragstart': 'drag(event)',
                             'id':'card'+card_id,

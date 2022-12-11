@@ -36,17 +36,21 @@
         <li><a class="navbar" href="stats">Statistics</a></li>
    </ul>
    <div class="box-body">
+        <div id="data">
+            <span>Number of players: {{ nr_players }}<br></span>
+            <span>Number of tokens necessary to win: {{ nr_tokens }}<br></span>
+            <span>Your tokens: {{ tokens }}<br></span>
+            <span>Tokens<br></span>
+            {% for k, v in tokens.items %}
+                <span id="token{{ k }}">{{ k }}: {{ v }}<br></span>
+            {% endfor %}
+            <span id="nr_pl" class="{{ nr_players }}"></span>
+            <span id="card_nr" class="{{ card_nr }}"></span>
 
-        <span>Number of players: {{ nr_players }}<br></span>
-        <span>Number of tokens necessary to win: {{ nr_tokens }}<br></span>
-        <span>Your tokens: {{ tokens }}<br></span>
-        <span id="nr_pl" class="{{ nr_players }}"></span>
-        <span id="card_nr" class="{{ card_nr }}"></span>
-
-        {% for k, v in players.items %}
-            <span id="{{ k }}" class="{{ v }}">{{ k }}, {{ v }}</span>
-        {% endfor %}
-
+            {% for k, v in players.items %}
+                <span id="{{ k }}" class="{{ v }}">{{ k }}, {{ v }}</span>
+            {% endfor %}
+        </div>
            <div id="cards">
                {% for x in nr_cards %}
                <img src="{% static 'Love letter/cardback.png' %}" class="deck" id="{{ x }}img" onclick="draw_card()">
@@ -54,7 +58,7 @@
                <br>
            </div>
        <div id="popup_form">
-           <form id="guard_card" name="cards">Choose a card:
+           <form id="guard_card" name="cards">Choose a card:<br>
                <input type="radio" id="2" name="card" value="2">
                <label for="2">Priest</label><br>
                <input type="radio" id="3" name="card" value="3">

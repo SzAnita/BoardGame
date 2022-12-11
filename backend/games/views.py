@@ -238,9 +238,12 @@ def play_loveletter(request):
     players = {
         'user': request.session.get('user_id')
     }
+    tokens = {
+        'user': 0,
+        'player1': 0
+    }
     context = {
         'nr_players': user.nr_players,
-        'tokens': 0,
         'card_nr': card_nr,
     }
     if user.nr_players == 2:
@@ -260,6 +263,7 @@ def play_loveletter(request):
         else:
             players['player1'] = player1
             players['player2'] = player2
+        tokens['player2'] = 0
         context['nr_cards'] = range(16 - user.nr_players - 1)
     elif user.nr_players == 4:
         nr_tokens = 4
@@ -279,9 +283,11 @@ def play_loveletter(request):
             players['player1'] = player1
             players['player2'] = player2
             players['player3'] = player3
+            tokens['player3'] = 0
         context['nr_cards'] = range(16 - user.nr_players - 4)
     context['nr_tokens'] = nr_tokens
     context['players'] = players
+    context['tokens'] = tokens
     return HttpResponse(template.render(context, request))
 
 
@@ -350,10 +356,10 @@ def update_discarded(request):
         ll[game_id].curr_round = False
         max_card = 0
         winner = ''
-        for p in ll[game_id].players:
-            if not ll[game_id].players[p].eliminate and ll[game_id].players[p].cards['curr'][0] > max_card:
-                max_card = ll[game_id].players[p].cards['curr'][0]
-                winner = p
+        for pl in ll[game_id].players:
+            if not ll[game_id].players[pl].eliminate and ll[game_id].players[pl].cards['curr'][0] > max_card:
+                max_card = ll[game_id].players[pl].cards['curr'][0]
+                winner = pl
         ll[game_id].round_win = winner
         ll[game_id].players[winner].tokens += 1
 
@@ -365,7 +371,8 @@ def update_discarded(request):
         response.append(p.msg)
         response.append(p.card_sel)
         ll[game_id].players[user].change = 0
-    p.msg = ''
+    if p.msg != 'prince':
+        p.msg = ''
     p.card_sel = ''
     if p.eliminate and request.GET.get('eliminateyou') == 'false':
         response.append('eliminate')
@@ -468,6 +475,8 @@ def prince(request):
     if player != user and not ll[game_id].players[player].handmaid and not ll[game_id].players[player].eliminate:
         ll[game_id].players[player].change = 1
         ll[game_id].players[player].msg = "prince"
+    elif player == user:
+        ll[game_id].players[user].draw_card == True
     msg = "You've been successful"
     card = ll[game_id].players[player].cards['curr'][0]
     return HttpResponse(json.dumps(msg))
