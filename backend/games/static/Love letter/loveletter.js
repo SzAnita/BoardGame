@@ -60,7 +60,7 @@ function get_curr_pl() {
     return you;
 }
 
-function card_action(card_nr, id) {
+function card_action(card_nr) {
     if (card_nr == '1') {
         //$('[name=players]').show();
         //$('[name=cards]').show();
@@ -258,7 +258,7 @@ function drop(ev) {
     ev.preventDefault();
     var data = ev.dataTransfer.getData("text");
     ev.target.appendChild(document.getElementById(data));
-    if(get_curr_pl() == true || $('#'+data).attr('class') == '8' || $('#prince').attr('class') == 'false') {
+    if(get_curr_pl() == true || $('#prince').attr('class') == 'false') {
         if ($('#'+data).attr('class') == '8') {
             $('#eliminateyou').attr('class') = 'true';
             $('#eliminateyou').html('Eliminated');
@@ -281,7 +281,7 @@ function drop(ev) {
             }
         });
         if ($('#prince').attr('class') == 'false') {
-            card_action($('#'+data).attr('class'), data);
+            card_action($('#'+data).attr('class'));
             $.ajax({
                 type: 'GET',
                 url: 'end_turn'
@@ -292,6 +292,7 @@ function drop(ev) {
             for (var i = 0; i <= x; i++) {
                 $('#'+i).show();
             }
+            $('#round_over').attr('class', 'false');
         } else  if ($('#prince').attr('class') == 'true'){
             $('#prince').attr('class', 'false');
         }
