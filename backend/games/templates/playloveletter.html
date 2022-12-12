@@ -46,10 +46,12 @@
             {% endfor %}
             <span id="nr_pl" class="{{ nr_players }}"></span>
             <span id="card_nr" class="{{ card_nr }}"></span>
-
+            <span id="card_range" class="{{ nr_cards }}"></span>
             {% for k, v in players.items %}
                 <span id="{{ k }}" class="{{ v }}">{{ k }}, {{ v }}</span>
             {% endfor %}
+            <span id="prince" class="false"></span>
+            <span id="round_over" class="false"></span>
         </div>
            <div id="cards">
                {% for x in nr_cards %}
