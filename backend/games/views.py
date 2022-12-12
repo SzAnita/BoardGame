@@ -379,7 +379,7 @@ def update_discarded(request):
     if p.msg != 'prince':
         p.msg = ''
     p.card_sel = ''
-    if p.eliminate and request.GET.get('eliminateyou') == 'false':
+    if p.eliminate and request.GET.get('eliminate') == 'false':
         response.append('eliminate')
     elif not p.eliminate:
         response.append('0')
