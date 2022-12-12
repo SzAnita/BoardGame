@@ -388,6 +388,7 @@ def update_discarded(request):
         p.eliminate = False
     if p.msg == 'king':
         response.append(p.cards['curr'][0])
+    response.append(ll[game_id].eliminated)
     return HttpResponse(json.dumps(response))
 
 
@@ -417,7 +418,7 @@ def guard(request):
     player = str(request.GET.get('player'))
     card = int(request.GET.get('card'))
     hit = 0
-    if ll[game_id].players[player].cards['curr'][0] == card:
+    if ll[game_id].players[player].cards['curr'][0] == card and not ll[game_id].players[player].handmaid:
         hit = 1
         ll[game_id].players[player].change = 1
         ll[game_id].players[player].msg = 'guard'
