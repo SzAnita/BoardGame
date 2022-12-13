@@ -317,14 +317,14 @@ def draw_card(request):
 
 def discard_card(request):
     src = request.GET.get('src')
-    user = str(request.GET.get('user'))
+    user = str(request.session.get('user_id'))
     card = int(request.GET.get('card_nr'))
     game_id = Users.objects.get(user_nr=user).game_nr
     ll[game_id].players[user].cards['discarded'].append(src)
     ll[game_id].players[user].cards['curr'].remove(card)
     response = 0
     if not ll[game_id].curr_round:
-        response = ll[game_id].winner
+        response = ll[game_id].round_win
     if card == 8:
         ll[game_id].players[user].eliminate = True
     return HttpResponse(json.dumps(response))
@@ -355,7 +355,7 @@ def update_discarded(request):
         response.append(cards)
     else:
         response.append(nr_discarded - discarded)
-    if (len(ll[game_id].cards) == 0 or ll[game_id].eliminated == ll[game_id].game.nr_players - 1) and ll[game_id].round_win != '':
+    if (len(ll[game_id].cards) == 0 or ll[game_id].eliminated == ll[game_id].game.nr_players - 1) and ll[game_id].round_win == '':
         ll[game_id].rounds += 1
         ll[game_id].curr_round = False
         max_card = 0
@@ -369,6 +369,8 @@ def update_discarded(request):
         ll[game_id].active = winner
 
         response.append(0)
+    elif ll[game_id].round_win != '' :
+        response.append(-1)
     else:
         response.append(1)
     response.append(ll[game_id].players[user].change)
@@ -379,10 +381,11 @@ def update_discarded(request):
     if p.msg != 'prince':
         p.msg = ''
     p.card_sel = ''
-    if p.eliminate and request.GET.get('eliminate') == 'false':
+    if (p.eliminate and request.GET.get('eliminated') == 'false'):
         response.append('eliminate')
-    elif not p.eliminate:
+    elif not p.eliminate and request.GET.get('eliminated') == 'true':
         response.append('0')
+        p.eliminate = True
     else:
         response.append('tie')
         p.eliminate = False
@@ -463,7 +466,7 @@ def baron(request):
         ll[game_id].eliminated += 1
         next_ = ll[game_id].players[user].next
         for p in ll[game_id].players:
-            if players[p].next == user:
+            if ll[game_id].players[p].next == user:
                 players[p].next = next_
                 break
         response.append(-1)

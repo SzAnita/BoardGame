@@ -61,9 +61,11 @@ function get_curr_pl() {
 }
 
 function card_action(card_nr) {
+    alert("This is card number: "+card_nr);
     if (card_nr == '1') {
-        //$('[name=players]').show();
-        //$('[name=cards]').show();
+        alert("Guard");
+        $('[name=players]').show();
+        $('[name=cards]').show();
         $('#get_player').click(function(){
             var player_id = $('input[name=player]:checked').val();
             var player_nr = $('input[name=player]:checked').attr('id');
@@ -77,8 +79,8 @@ function card_action(card_nr) {
                     'card': card
                 },
                 success: function(data) {
-                    //$('[name=players]').hide();
-                    //$('[name=card]').hide();
+                    $('[name=players]').hide();
+                    $('[name=card]').hide();
                     alert("Testing chosen player: "+player);
                     alert("Testing chosen card: "+card);
                     if (data == '0') {
@@ -92,7 +94,8 @@ function card_action(card_nr) {
             });
         });
     } else if(card_nr == '2') {
-        //$('[name=players]').show();
+        alert('Priest');
+        $('[name=players]').show();
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
             var player_nr = $('input[name=player]:checked').attr('id');
@@ -104,13 +107,14 @@ function card_action(card_nr) {
                     'player': player_id
                 },
                 success: function(data) {
-                    //$('[name=players]').hide();
+                    $('[name=players]').hide();
                     alert(player+" has card "+data);
                 }
             });
         });
     } else if(card_nr == '3') {
-        //$('[name=players]').show();
+        alert('baron');
+        $('[name=players]').show();
         var player_id = $('input[name=player]:checked').val();
         var player_nr = $('input[name=player]:checked').attr('id');
         var player = $('label[for='+player_nr+']').html();
@@ -122,6 +126,7 @@ function card_action(card_nr) {
                     'player': player_id
                 },
                 success: function(data) {
+                    $('[name=players]').hide();
                     alert("Testing if baron was successful");
                     response = JSON.parse(data);
                     if(response[0] == 1) {
@@ -142,12 +147,14 @@ function card_action(card_nr) {
             });
         });
     } else if(card_nr == '4') {
+        alert('handmaid');
         $.ajax ({
             type: 'GET',
             url: 'handmaid',
         });
     } else if(card_nr == '5') {
-        //$('[name=players]').show();
+        alert('prince');
+        $('[name=players]').show();
         var me = $('<input>');
         me.attr({
             'type': 'radio',
@@ -171,12 +178,14 @@ function card_action(card_nr) {
                     'player': player_id
                 },
             });
-            //$('[name=players]').hide();
+            $('[name=players]').hide();
             me.remove();
             label2.remove();
         });
-    } else if(card_nr == '6') {                
-        //$('[name=players]').show();
+        $('[name=players]').hide();
+    } else if(card_nr == '6') { 
+        alert('king');               
+        $('[name=players]').show();
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
             var player_nr = $('input[name=player]:checked').attr('id');
@@ -189,13 +198,14 @@ function card_action(card_nr) {
                     'player': player_id
                 },
                 success: function(data) {
+                    $('[name=players]').hide();
                     $('#my_cards img').remove();
                     $img = get_card_src(data);
                     $card = $('<img>');
                     $card.attr({
                         'src': $img,
                         'id': 'card'+card_id,
-                        'height': '150px',
+                        'height': '90px',
                         'class': data,
                         'draggable': 'true',
                         'ondragstart': 'drag(event)'
@@ -206,6 +216,7 @@ function card_action(card_nr) {
             });
         });
     } else if(card_nr == '8') {
+        alert('princess');
         $.ajax({
             type: 'GET',
             url: 'princess',
@@ -228,7 +239,7 @@ function draw_card() {
                 card.attr({
                     'src': $img,
                     'id': 'card'+card_id,
-                    'height': '150px',
+                    'height': '90px',
                     'class': data,
                     'draggable': 'true',
                     'ondragstart': 'drag(event)'
@@ -260,7 +271,7 @@ function drop(ev) {
     ev.target.appendChild(document.getElementById(data));
     if(get_curr_pl() == true || $('#prince').attr('class') == 'false') {
         if ($('#'+data).attr('class') == '8') {
-            $('#eliminateyou').attr('class') = 'true';
+            $('#eliminateyou').attr('class', 'true');
             $('#eliminateyou').html('Eliminated');
         }
         $.ajax ({
@@ -268,7 +279,6 @@ function drop(ev) {
             url: 'discard_card',
             data: {
                 'src': $('#'+data).attr('src'),
-                'user': $('#user').attr('class'),
                 'card_nr':$('#'+data).attr('class')
             },
             success: function(data) {
@@ -280,7 +290,8 @@ function drop(ev) {
                $('.box_body').append('<p>Ajax request succeeded</p>');
             }
         });
-        if ($('#prince').attr('class') == 'false') {
+        if ($('#prince').attr('class') == 'false' && $('#round_over').attr('class') == 'false') {
+            alert("This is the card_id: "+data);
             card_action($('#'+data).attr('class'));
             $.ajax({
                 type: 'GET',
@@ -314,7 +325,7 @@ $(document).ready(function() {
         $card.attr({
             'src': $img_src,
             'id': 'card'+card_id,
-            'height': '150px',
+            'height': '90px',
             'class': card_nr,
             'draggable': "false",
             'ondragstart': 'drag(event)'
@@ -335,8 +346,8 @@ $(document).ready(function() {
         var submit = $('<input type="button" value="Submit" id="get_player">');
         form1.append(player1, label1, submit);
         $('#popup_form').append(form1)
-        //$('[name=players]').hide();
-        //$('[name=cards]').hide();
+        $('[name=players]').hide();
+        $('[name=cards]').hide();
     }
 })
 myInterval = setInterval(check_discarded, '5000');
@@ -361,7 +372,7 @@ function check_discarded() {
                         var card = $("<img>");
                         card.attr({
                         'src': response[0][x],
-                        'height': '150px',
+                        'height': '90px',
                         })
                         $('#Player1 .discarded').append(card);
                     }
@@ -394,11 +405,11 @@ function check_discarded() {
                     } else if(response[3] == 'king') {
                         alert("The current player has chosen to perform on you the effect of the card king, so your cards have been traded");
                         $('#my_cards img').remove();
-                        var img = get_card_src(toString(response[4]));
+                        $img = get_card_src(response[4]);
                         var card = $("<img>");
                         card.attr({
-                            'src': img,
-                            'height': '150px',
+                            'src': $img,
+                            'height': '90px',
                             'draggable': 'false',
                             'ondragstart': 'drag(event)',
                             'id':'card'+card_id,
@@ -406,7 +417,7 @@ function check_discarded() {
                         });
                         $('#my_cards').append(card);
                     }
-                    if (response[1] != 1) {
+                    if (response[1] == 0) {
                         alert("This round has ended. Please discard your card");
                         $('#my_cards img').attr('draggable', 'true');
                         $('#round_over').attr('class', 'true');
