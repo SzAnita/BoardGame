@@ -16,6 +16,7 @@ urlpatterns = [
     path('loveletter/playing/get_discarded', views.update_discarded, name='get_discarded'),
     path('loveletter/playing/protected_players', views.protected_players, name='protected_players'),
     path('loveletter/playing/get_curr', views.curr_pl, name='get_curr'),
+    path('loveletter/playing/round_over', views.round_over, name='round_over'),
     path('loveletter/playing/guard', views.guard, name='guard'),
     path('loveletter/playing/priest', views.priest, name='priest'),
     path('loveletter/playing/baron', views.baron, name='baron'),

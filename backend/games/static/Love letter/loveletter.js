@@ -284,7 +284,8 @@ function drop(ev) {
             success: function(data) {
                 response = JSON.parse(data)
                 if (response != 0) {
-                    var player = $('#data span .'+response).attr('id');
+                    alert("This should be the winner's id: "+data+ " "+response);
+                    var player = $('#data span .'+data).attr('id');
                     alert(player+" has won");
                 }
                $('.box_body').append('<p>Ajax request succeeded</p>');
@@ -297,16 +298,17 @@ function drop(ev) {
                 type: 'GET',
                 url: 'end_turn'
             });
-        } else if($('#round_over').attr('class') == 'true') {
+        } else  if ($('#prince').attr('class') == 'true'){
+            $('#prince').attr('class', 'false');
+        }
+        if($('#round_over').attr('class') == 'true') {
             $('#Player1 .discarded').empty();
             $('#my_cards').empty();
             for (var i = 0; i <= x; i++) {
                 $('#'+i).show();
             }
             $('#round_over').attr('class', 'false');
-        } else  if ($('#prince').attr('class') == 'true'){
-            $('#prince').attr('class', 'false');
-        }
+        } 
     }
     $('#my_cards img').attr('draggable', 'false');
 }
@@ -333,7 +335,65 @@ $(document).ready(function() {
         card_id++;
         $div.append($card);
         $('#you').append($div);
-        var form1 = $('<form name="players" id="player">Choose a player:<br></form>');
+        var form1 = $('<form name="cards" id="guard">Choose a card:<br></form>');
+        var priest = $('<input>');
+        priest.attr({
+            'type': 'radio',
+            'id': '2',
+            'name': 'card',
+            'value': '2'
+        });
+        var priest_label = $('<label for="2">Priest</label><br>');
+        var baron = $('<input>');
+        baron.attr({
+            'type': 'radio',
+            'id': '3',
+            'name': 'card',
+            'value': '3'
+        });
+        var baron_label = $('<label for="3">Baron</label><br>');
+        var handmaid = $('<input>');
+        handmaid.attr({
+            'type': 'radio',
+            'id': '4',
+            'name': 'card',
+            'value': '4'
+        });
+        var handmaid_label = $('<label for="4">Handmaid</label><br>');
+        var prince = $('<input>');
+        prince.attr({
+            'type': 'radio',
+            'id': '5',
+            'name': 'card',
+            'value': '5'
+        });
+        var prince_label = $('<label for="5">Prince</label><br>');
+        var king = $('<input>');
+        king.attr({
+            'type': 'radio',
+            'id': '6',
+            'name': 'card',
+            'value': '6'
+        });
+        var king_label = $('<label for="6">King</label><br>');
+        var countess = $('<input>');
+        countess.attr({
+            'type': 'radio',
+            'id': '7',
+            'name': 'card',
+            'value': '7'
+        });
+        var countess_label = $('<label for="7">Countess</label><br>');
+        var princess = $('<input>');
+        princess.attr({
+            'type': 'radio',
+            'id': '8',
+            'name': 'card',
+            'value': '8'
+        });
+        var princess_label = $('<label for="8">Princess</label><br>');
+        form1.append(priest, priest_label, baron, baron_label, handmaid, handmaid_label, prince, prince_label, king, king_label, countess, countess_label, princess, princess_label);
+        var form2 = $('<form name="players" id="player">Choose a player:<br></form>');
         var player1_id = $('#player1').attr('class');
         var player1 = $('<input>');
         player1.attr({
@@ -344,8 +404,8 @@ $(document).ready(function() {
         })
         var label1 = $('<label for="_player1">Player 1</label><br>');
         var submit = $('<input type="button" value="Submit" id="get_player">');
-        form1.append(player1, label1, submit);
-        $('#popup_form').append(form1)
+        form2.append(player1, label1, submit);
+        $('#popup_form').append(form1, form2);
         $('[name=players]').hide();
         $('[name=cards]').hide();
     }
@@ -417,11 +477,22 @@ function check_discarded() {
                         });
                         $('#my_cards').append(card);
                     }
-                    if (response[1] == 0) {
-                        alert("This round has ended. Please discard your card");
-                        $('#my_cards img').attr('draggable', 'true');
-                        $('#round_over').attr('class', 'true');
-                    }
+                }
+                if ((response[1] == 0 || response[1] == -1) && $('#round_over').attr('class') == 'false') {
+                    alert("This round has ended. Please discard your card");
+                    $('#my_cards img').attr('draggable', 'true');
+                    $('#round_over').attr('class', 'true');
+                } else if(response[1] == -1 && $('#round_over').attr('class') == 'true') {
+                    $.ajax({
+                        type: 'GET',
+                        url: 'round_over',
+                        success: function(data) {
+                            var response = JSON.parse(data);
+                            if (response == 1) {
+                                $('#round_over').attr('class', 'false');
+                            }
+                        }
+                    });
                 }
             }
         });

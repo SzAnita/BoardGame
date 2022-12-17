@@ -24,6 +24,7 @@ class Player:
         self.card_sel = ''
         self.tokens = 0
         self.change = 0
+        self.round_over = 0
 
 
 class LoveLetterGame:
@@ -378,6 +379,8 @@ def update_discarded(request):
         response.append(p.msg)
         response.append(p.card_sel)
         ll[game_id].players[user].change = 0
+    if p.msg == 'king':
+        response.append(p.cards['curr'][0])
     if p.msg != 'prince':
         p.msg = ''
     p.card_sel = ''
@@ -388,9 +391,6 @@ def update_discarded(request):
         p.eliminate = True
     else:
         response.append('tie')
-        p.eliminate = False
-    if p.msg == 'king':
-        response.append(p.cards['curr'][0])
     response.append(ll[game_id].eliminated)
     return HttpResponse(json.dumps(response))
 
@@ -414,6 +414,23 @@ def curr_pl(request):
     else:
         return HttpResponse(json.dumps(0))
 
+
+def round_over(request):
+    user = request.session.get('user_id')
+    game_id = Users.objects.get(user_nr=user).game_nr
+    roundover = 0
+    ll[game_id].players[user].round_over = 1
+    if ll[game_id].round_win != '':
+        for pl in ll[game_id].players:
+            if ll[game_id].players[pl].round_over == 1:
+                roundover += 1
+        if roundover == LoveLetter.objects.get(game_nr=game_id).nr_players:
+            ll[game_id].round_win = ''
+            for pl in ll[game_id].players:
+                ll[game_id].players[pl].round_over = 0
+        return HttpResponse(json.dumps(1))
+    else:
+        return HttpResponse(json.dumps(0))
 
 def guard(request):
     user = str(request.session.get('user_id'))
@@ -467,7 +484,7 @@ def baron(request):
         next_ = ll[game_id].players[user].next
         for p in ll[game_id].players:
             if ll[game_id].players[p].next == user:
-                players[p].next = next_
+                ll[game_id].players[p].next = next_
                 break
         response.append(-1)
         response.append(player_card)
@@ -527,8 +544,8 @@ def princess(request):
     ll[game_id].eliminated += 1
     next_ = ll[game_id].players[user].next
     for p in ll[game_id].players:
-        if players[p].next == user:
-            players[p].next = next_
+        if ll[game_id].players[p].next == user:
+            ll[game_id].players[p].next = next_
             break
     msg = "You've been eliminated"
     return HttpResponse(json.dumps(msg))
