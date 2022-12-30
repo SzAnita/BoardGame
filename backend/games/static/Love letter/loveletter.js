@@ -61,9 +61,7 @@ function get_curr_pl() {
 }
 
 function card_action(card_nr) {
-    alert("This is card number: "+card_nr);
     if (card_nr == '1') {
-        alert("Guard");
         $('#popup_form').show();
         $('#popup_guard').show();
         $('#get_player').click(function(){
@@ -88,11 +86,13 @@ function card_action(card_nr) {
                         $('#eliminate1').attr('class', 'true');
                         $('#eliminate1').text('Eliminated');
                     }
+                    alert("This is playernr: "+player_nr);
+                    $("#"+player_nr).prop("checked", "false");
+                    $("#"+card).prop("checked", "false");
                 }
             });
         });
     } else if(card_nr == '2') {
-        alert('Priest');
         $('#popup_form').show();
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
@@ -105,13 +105,14 @@ function card_action(card_nr) {
                     'player': player_id
                 },
                 success: function(data) {
+                    alert("This is playernr: "+player_nr);
                     $('#popup_form').hide();
                     alert(player+" has card "+data);
+                    $("#"+player_nr).prop("checked", "false");
                 }
             });
         });
     } else if(card_nr == '3') {
-        alert('baron');
         $('[name=players]').show();
         var player_id = $('input[name=player]:checked').val();
         var player_nr = $('input[name=player]:checked').attr('id');
@@ -140,6 +141,7 @@ function card_action(card_nr) {
                         alert(data);
                         alert("Data is not of type string");
                     }
+                    $("#"+player_nr).prop("checked", "false");
                 }
             });
         });
@@ -150,7 +152,6 @@ function card_action(card_nr) {
             url: 'handmaid',
         });
     } else if(card_nr == '5') {
-        alert('prince');
         $('#popup_form').show();
         var me = $('<input>');
         me.attr({
@@ -174,14 +175,15 @@ function card_action(card_nr) {
                 data: {
                     'player': player_id
                 },
+                success: function(data) {
+                    $('#popup_form').hide();
+                    me.remove();
+                    label2.remove();
+                    $("#"+player_nr).prop("checked", "false");
+                }
             });
-            $('#popup_form').hide();
-            me.remove();
-            label2.remove();
         });
-        $('#popup_form').hide();
-    } else if(card_nr == '6') { 
-        alert('king');               
+    } else if(card_nr == '6') {               
         $('#popup_form').show();
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
@@ -213,7 +215,6 @@ function card_action(card_nr) {
             });
         });
     } else if(card_nr == '8') {
-        alert('princess');
         $.ajax({
             type: 'GET',
             url: 'princess',
@@ -397,14 +398,15 @@ $(document).ready(function() {
             'type': 'radio',
             'id': '_player1',
             'name': 'player',
-            'value': player1_id
+            'value': player1_id,
+            'checked': 'false'
         })
         var label1 = $('<label for="_player1">Player 1</label><br>');
         var submit = $('<input type="button" value="Submit" id="get_player">');
         form2.append(player1, label1, submit);
         $('#popup_form').append(form2);
         $('#popup_guard').hide();
-        $('#popup_form').hide();
+        //$('#popup_form').hide();
     }
 })
 myInterval = setInterval(check_discarded, '5000');
