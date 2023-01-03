@@ -28,7 +28,7 @@ class Player:
 
 
 class LoveLetterGame:
-    def __init__(self, game):
+    def __init__(self, game, tokens):
         self.game_id = game
         self.cards = [1, 1, 1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8]
         self.game = LoveLetter.objects.get(game_nr=self.game_id)
@@ -40,6 +40,7 @@ class LoveLetterGame:
         self.curr_round = True
         self.eliminated = 0
         self.round_win = ''
+        self.tokens_to_win = tokens
 
     def get_new_card(self, player):
         rand = random.randint(0, len(self.cards) - 1)
@@ -138,7 +139,14 @@ def get_players_loveletter(request):
     if len(waiting_games) == 0:
         love_letter = LoveLetter(nr_players, player1, player2, player3, player4, nr_game, 'waiting', nr_players - 1)
         love_letter.save()
-        ll[nr_game] = LoveLetterGame(user.game_nr)
+        tokens = 0;
+        if nr_players == 2:
+            tokens = 7
+        elif nr_players == 3:
+            tokens = 5
+        elif nr_players == 4:
+            tokens = 4
+        ll[nr_game] = LoveLetterGame(user.game_nr, tokens)
     else:
         if get_players.count() == 1:
             player1 = LoveLetter.objects.get(game_nr=nr_game).player1
@@ -428,9 +436,64 @@ def round_over(request):
             ll[game_id].round_win = ''
             for pl in ll[game_id].players:
                 ll[game_id].players[pl].round_over = 0
-        return HttpResponse(json.dumps(1))
+            return HttpResponse(json.dumps(1))
     else:
         return HttpResponse(json.dumps(0))
+
+
+def check_tokens(request):
+    user = request.session.get('user_id')
+    game_id = Users.objects.get(user_nr=user).game_nr
+    max_token = 0;
+    Player p;
+    for pl in ll[game_id].players:
+        if ll[game_id].players[pl].tokens > max_token:
+            max_token = pl.tokens
+            p = pl
+    response = []
+    if max_token == ll[game_id].tokens_to_win:
+        response.append(1)
+        tokens = {}
+        tokens[user] = ll[game_id].players[user].tokens
+        game = LoveLetter.objects.get(game_nr=game_id)
+        if game.nr_players == 2:
+            if game.player1 != user:
+                tokens['player1'] = ll[game_id].players[game.player1].tokens
+            else:
+                tokens['player1'] = ll[game_id].players[game.player2]
+        elif game.nr_players == 3:
+            if game.player1 == user:
+                tokens['player1'] = ll[game_id].players[game.player2].tokens
+                tokens['player2'] = ll[game_id].players[game.player3].tokens
+            elif game.player2 == user:
+                tokens['player1'] = ll[game_id].players[game.player1].tokens
+                tokens['player2'] = ll[game_id].players[game.player3].tokens
+            else:
+                tokens['player1'] = ll[game_id].players[game.player1].tokens
+                tokens['player2'] = ll[game_id].players[game.player2].tokens 
+        else:
+            if game.player1 == user:
+                tokens['player1'] = ll[game_id].players[game.player2].tokens
+                tokens['player2'] = ll[game_id].players[game.player3].tokens
+                tokens['player3'] = ll[game_id].players[game.player4].tokens
+            elif game.player2 == user:
+                tokens['player1'] = ll[game_id].players[game.player1].tokens
+                tokens['player2'] = ll[game_id].players[game.player3].tokens
+                tokens['player3'] = ll[game_id].players[game.player4].tokens
+            elif game.player3 == user:
+                tokens['player1'] = ll[game_id].players[game.player1].tokens
+                tokens['player2'] = ll[game_id].players[game.player2].tokens
+                tokens['player3'] = ll[game_id].players[game.player4].tokens 
+            else:
+                tokens['player1'] = ll[game_id].players[game.player1].tokens
+                tokens['player2'] = ll[game_id].players[game.player2].tokens
+                tokens['player3'] = ll[game_id].players[game.player3].tokens 
+
+        response.append(tokens)            
+    else:
+        response.append(0)
+    return HttpResponse(json.dumps(response))
+
 
 def guard(request):
     user = str(request.session.get('user_id'))

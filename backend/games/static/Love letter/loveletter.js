@@ -280,7 +280,8 @@ function drop(ev) {
                 'card_nr':$('#'+data).attr('class')
             },
             success: function(data) {
-                response = JSON.parse(data)
+                response = JSON.parse(data);
+                parseInt(response);
                 if (response != 0) {
                     alert("This should be the winner's id: "+data+ " "+response);
                     var player = $('#data span .'+data).attr('id');
@@ -489,6 +490,26 @@ function check_discarded() {
                             var response = JSON.parse(data);
                             if (response == 1) {
                                 $('#round_over').attr('class', 'false');
+                            }
+                        }
+                    });
+                }
+                if(response[2] == 0 && response[4] == parseInt($('#nr_pl').attr('class'))) {
+                    $('#Player1 .discarded').empty();
+                    $('#my_cards').empty();
+                    for (var i = 0; i <= x; i++) {
+                        $('#'+i).show();
+                    }
+                    $.ajax({
+                        type: 'GET',
+                        url: 'check_tokens',
+                        success: function(data) {
+                            var response = JSON.parse(data);
+                            if (response[0] == 1){
+                                var tokens = response[1];
+                                for(p in tokens) {
+                                    $('#token'+p).text(tokens[p]);
+                                }   
                             }
                         }
                     });
