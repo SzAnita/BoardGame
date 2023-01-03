@@ -139,7 +139,7 @@ def get_players_loveletter(request):
     if len(waiting_games) == 0:
         love_letter = LoveLetter(nr_players, player1, player2, player3, player4, nr_game, 'waiting', nr_players - 1)
         love_letter.save()
-        tokens = 0;
+        tokens = 0
         if nr_players == 2:
             tokens = 7
         elif nr_players == 3:
@@ -392,7 +392,7 @@ def update_discarded(request):
     if p.msg != 'prince':
         p.msg = ''
     p.card_sel = ''
-    if (p.eliminate and request.GET.get('eliminated') == 'false'):
+    if p.eliminate and request.GET.get('eliminated') == 'false':
         response.append('eliminate')
     elif not p.eliminate and request.GET.get('eliminated') == 'true':
         response.append('0')
@@ -444,54 +444,53 @@ def round_over(request):
 def check_tokens(request):
     user = request.session.get('user_id')
     game_id = Users.objects.get(user_nr=user).game_nr
-    max_token = 0;
-    Player p;
+    max_token = ll[game_id].players[user].tokens
+    p = ll[game_id].players[user]
     for pl in ll[game_id].players:
         if ll[game_id].players[pl].tokens > max_token:
             max_token = pl.tokens
             p = pl
     response = []
+    tokens = {'user': ll[game_id].players[user].tokens}
+    game = LoveLetter.objects.get(game_nr=game_id)
+    if game.nr_players == 2:
+        if game.player1 != user:
+            tokens['player1'] = ll[game_id].players[game.player1].tokens
+        else:
+            tokens['player1'] = ll[game_id].players[game.player2]
+    elif game.nr_players == 3:
+        if game.player1 == user:
+            tokens['player1'] = ll[game_id].players[game.player2].tokens
+            tokens['player2'] = ll[game_id].players[game.player3].tokens
+        elif game.player2 == user:
+            tokens['player1'] = ll[game_id].players[game.player1].tokens
+            tokens['player2'] = ll[game_id].players[game.player3].tokens
+        else:
+            tokens['player1'] = ll[game_id].players[game.player1].tokens
+            tokens['player2'] = ll[game_id].players[game.player2].tokens 
+    else:
+        if game.player1 == user:
+            tokens['player1'] = ll[game_id].players[game.player2].tokens
+            tokens['player2'] = ll[game_id].players[game.player3].tokens
+            tokens['player3'] = ll[game_id].players[game.player4].tokens
+        elif game.player2 == user:
+            tokens['player1'] = ll[game_id].players[game.player1].tokens
+            tokens['player2'] = ll[game_id].players[game.player3].tokens
+            tokens['player3'] = ll[game_id].players[game.player4].tokens
+        elif game.player3 == user:
+            tokens['player1'] = ll[game_id].players[game.player1].tokens
+            tokens['player2'] = ll[game_id].players[game.player2].tokens
+            tokens['player3'] = ll[game_id].players[game.player4].tokens 
+        else:
+            tokens['player1'] = ll[game_id].players[game.player1].tokens
+            tokens['player2'] = ll[game_id].players[game.player2].tokens
+            tokens['player3'] = ll[game_id].players[game.player3].tokens 
+    response.append(tokens)     
     if max_token == ll[game_id].tokens_to_win:
         response.append(1)
-        tokens = {}
-        tokens[user] = ll[game_id].players[user].tokens
-        game = LoveLetter.objects.get(game_nr=game_id)
-        if game.nr_players == 2:
-            if game.player1 != user:
-                tokens['player1'] = ll[game_id].players[game.player1].tokens
-            else:
-                tokens['player1'] = ll[game_id].players[game.player2]
-        elif game.nr_players == 3:
-            if game.player1 == user:
-                tokens['player1'] = ll[game_id].players[game.player2].tokens
-                tokens['player2'] = ll[game_id].players[game.player3].tokens
-            elif game.player2 == user:
-                tokens['player1'] = ll[game_id].players[game.player1].tokens
-                tokens['player2'] = ll[game_id].players[game.player3].tokens
-            else:
-                tokens['player1'] = ll[game_id].players[game.player1].tokens
-                tokens['player2'] = ll[game_id].players[game.player2].tokens 
-        else:
-            if game.player1 == user:
-                tokens['player1'] = ll[game_id].players[game.player2].tokens
-                tokens['player2'] = ll[game_id].players[game.player3].tokens
-                tokens['player3'] = ll[game_id].players[game.player4].tokens
-            elif game.player2 == user:
-                tokens['player1'] = ll[game_id].players[game.player1].tokens
-                tokens['player2'] = ll[game_id].players[game.player3].tokens
-                tokens['player3'] = ll[game_id].players[game.player4].tokens
-            elif game.player3 == user:
-                tokens['player1'] = ll[game_id].players[game.player1].tokens
-                tokens['player2'] = ll[game_id].players[game.player2].tokens
-                tokens['player3'] = ll[game_id].players[game.player4].tokens 
-            else:
-                tokens['player1'] = ll[game_id].players[game.player1].tokens
-                tokens['player2'] = ll[game_id].players[game.player2].tokens
-                tokens['player3'] = ll[game_id].players[game.player3].tokens 
-
-        response.append(tokens)            
+        response.append(p.id)
     else:
-        response.append(0)
+        response.append(0)       
     return HttpResponse(json.dumps(response))
 
 
@@ -576,11 +575,10 @@ def prince(request):
         ll[game_id].players[player].change = 1
         ll[game_id].players[player].msg = "prince"
     elif player == user:
-        ll[game_id].players[user].draw_card == True
+        ll[game_id].players[user].draw_card = True
     msg = "You've been successful"
     card = ll[game_id].players[player].cards['curr'][0]
     return HttpResponse(json.dumps(msg))
-
 
 
 def king(request):

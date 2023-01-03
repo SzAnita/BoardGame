@@ -505,12 +505,13 @@ function check_discarded() {
                         url: 'check_tokens',
                         success: function(data) {
                             var response = JSON.parse(data);
-                            if (response[0] == 1){
-                                var tokens = response[1];
-                                for(p in tokens) {
-                                    $('#token'+p).text(tokens[p]);
-                                }   
-                            }
+                            var tokens = response[0];
+                            for(p in tokens) {
+                                $('#token'+p).text(tokens[p]);
+                            }  
+                            if(response[1] == 1) {
+                                alert("The winner of the game is: "+$('#'+response[2]).attr('class'));
+                            } 
                         }
                     });
                 }
