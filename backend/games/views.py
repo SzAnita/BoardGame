@@ -428,6 +428,7 @@ def round_over(request):
     game_id = Users.objects.get(user_nr=user).game_nr
     roundover = 0
     ll[game_id].players[user].round_over = 1
+    response = []
     if ll[game_id].round_win != '':
         for pl in ll[game_id].players:
             if ll[game_id].players[pl].round_over == 1:
@@ -436,9 +437,10 @@ def round_over(request):
             ll[game_id].round_win = ''
             for pl in ll[game_id].players:
                 ll[game_id].players[pl].round_over = 0
-            return HttpResponse(json.dumps(1))
+            response.append(0)
     else:
-        return HttpResponse(json.dumps(0))
+        response.append(1)
+    return HttpResponse(json.dumps(response))
 
 
 def check_tokens(request):

@@ -113,7 +113,7 @@ function card_action(card_nr) {
             });
         });
     } else if(card_nr == '3') {
-        $('[name=players]').show();
+        $('#popup_form').show();
         var player_id = $('input[name=player]:checked').val();
         var player_nr = $('input[name=player]:checked').attr('id');
         var player = $('label[for='+player_nr+']').html();
