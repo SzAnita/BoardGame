@@ -3,21 +3,21 @@ var card_id = 1;
 
 function get_card_src(card_nr) {
     if (card_nr == "1") {
-        return guard;
+        return Guard;
     } else if (card_nr == "2") {
-        return priest;
+        return Priest;
     } else if (card_nr == "3") {
-        return baron;
+        return Baron;
     } else if (card_nr == "4") {
-        return handmaid;
+        return Handmaid;
     } else if (card_nr == "5") {
-        return prince;
+        return Prince;
     } else if (card_nr == "6") {
-        return king;
+        return King;
     } else if (card_nr == "7") {
-        return countess;
+        return Countess;
     } else if (card_nr == "8") {
-        return princess;
+        return Princess;
     }
 }
 
@@ -74,7 +74,8 @@ function players_form(prince) {
         }
         var submit = $('<input type="button" value="Submit" id="get_player">');
         form.append(submit);
-        $('#boxbody').append(form);
+        $('#popup_form').append(form);
+        $('#popup_guard').after('#popup_form');
 }
 
 function protected_players() {
@@ -115,6 +116,197 @@ function get_curr_pl() {
     });
     return you;
 }
+function guard() {
+    players_form(0);
+        $('#popup_guard').show();
+        $('#get_player').click(function(){
+            var player_id = $('input[name=player]:checked').val();
+            var player_nr = $('input[name=player]:checked').attr('id');
+            var player = $('label[for='+player_nr+']').text();
+            var card = $('input[name=card]:checked').val();
+            $.ajax({
+                type: 'GET',
+                url: 'guard',
+                data: {
+                    'player': player_id,
+                    'card': card
+                },
+                success: function(data) {
+                    $('#popup_form').remove();
+                    $('#popup_guard').hide();
+                    if (data == '0') {
+                        alert(player+" didn't have card "+card);
+                    } else if (data == '1') {
+                        alert("You have eliminated "+player);
+                        $('#eliminate1').attr('class', 'true');
+                        $('#eliminate1').text('Eliminated');
+                    }
+                    alert("This is playernr: "+player_nr);
+                    $("#"+player_nr).prop("checked", "false");
+                    $("#"+card).prop("checked", "false");
+                    $.ajax({
+                        type: 'GET',
+                        url: 'end_turn'
+                    });
+                }
+            });
+        });
+}
+
+function priest() {
+    players_form(0);
+        $('#get_player').click(function() {
+            var player_id = $('input[name=player]:checked').val();
+            var player_nr = $('input[name=player]:checked').attr('id');
+            var player = $('label[for='+player_nr+']').text();
+            $.ajax ({
+                type: 'GET',
+                url: 'priest',
+                data: {
+                    'player': player_id
+                },
+                success: function(data) {
+                    alert("This is playernr: "+player_nr);
+                    $('#popup_form').remove();
+                    alert(player+" has card "+data);
+                    $.ajax({
+                        type: 'GET',
+                        url: 'end_turn'
+                    });
+                }
+            });
+        });
+}
+
+function baron() {
+    players_form(0);
+        var player_id = $('input[name=player]:checked').val();
+        var player_nr = $('input[name=player]:checked').attr('id');
+        var player = $('label[for='+player_nr+']').html();
+        $('#get_player').click(function() {
+            $.ajax ({
+                type: 'GET',
+                url: 'baron',
+                data: {
+                    'player': player_id
+                },
+                success: function(data) {
+                    $('#popup_form').remove();
+                    response = JSON.parse(data);
+                    if(response[0] == 1) {
+                        alert(player+" has card "+data[1]+" so you have eliminated "+player);
+                        $('#eliminate1').attr('class', 'true');
+                        $('#eliminate1').html('Eliminated');
+                    } else if(response[0] == -1) {
+                        alert(player+" has card"+data[1]+" so you have been eliminated by"+player);
+                        $('#'+player+' #eliminated').attr('class', 'true');
+                        $('#'+player+' #eliminated').html('Eliminated');
+                    } else if(response[0] == 0) {
+                        alert("Both of you have the same cards");
+                    } else {
+                        alert(data);
+                        alert("Data is not of type string");
+                    }
+                    $.ajax({
+                        type: 'GET',
+                        url: 'end_turn'
+                    });
+                }
+            });
+        });
+}
+
+function handmaid() {
+    alert('handmaid');
+    $.ajax ({
+        type: 'GET',
+        url: 'handmaid',
+        success: function() {
+            $.ajax({
+                type: 'GET',
+                url: 'end_turn'
+            });
+        }
+    });
+}
+
+function prince() {
+    players_form(1);
+        $('#get_player').click(function() {
+            var player_id = $('input[name=player]:checked').val();
+            var player_nr = $('input[name=player]:checked').attr('id');
+            var player = $('label[for='+player_nr+']').text();
+            if (player == 'me') {
+                $('#my_cards img').attr('draggable', 'true');
+            }
+            $.ajax({
+                type: 'GET',
+                url: 'prince',
+                data: {
+                    'player': player_id
+                },
+                success: function(data) {
+                    $('#popup_form').remove();
+                    $.ajax({
+                        type: 'GET',
+                        url: 'end_turn'
+                    });
+                }
+            });
+        });
+}
+
+function king() {
+    players_form(0);
+        $('#get_player').click(function() {
+            var player_id = $('input[name=player]:checked').val();
+            var player_nr = $('input[name=player]:checked').attr('id');
+            var player = $('label[for='+player_nr+']').text();
+            $.ajax({
+                type: 'GET',
+                url: 'king',
+                data: {
+                    'my_card': $('#my_cards img').attr('class'),
+                    'player': player_id
+                },
+                success: function(data) {
+                    $('#popup_form').remove();
+                    $('#my_cards img').remove();
+                    $img = get_card_src(data);
+                    $card = $('<img>');
+                    $card.attr({
+                        'src': $img,
+                        'id': 'card'+card_id,
+                        'height': '90px',
+                        'class': data,
+                        'draggable': 'true',
+                        'ondragstart': 'drag(event)'
+                    });
+                    card_id++;
+                    $('#my_cards').append($card);
+                    $.ajax({
+                        type: 'GET',
+                        url: 'end_turn'
+                    });
+                }
+            });
+        });
+}
+
+function princess() {
+    $.ajax({
+        type: 'GET',
+        url: 'princess',
+        success: function() {
+            $.ajax({
+                type: 'GET',
+                url: 'end_turn'
+            });
+        }
+    });
+    $('#eliminateyou').attr('class', 'true');
+    $('#eliminateyou').html('Eliminated');
+}
 
 function card_action(card_nr) {
     if (card_nr == '1') {
@@ -148,7 +340,8 @@ function card_action(card_nr) {
                 }
             });
         });
-    } else if(card_nr == '2') {
+    } 
+    else if(card_nr == '2') {
         players_form(0);
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
@@ -167,7 +360,8 @@ function card_action(card_nr) {
                 }
             });
         });
-    } else if(card_nr == '3') {
+    } 
+    else if(card_nr == '3') {
         players_form(0);
         var player_id = $('input[name=player]:checked').val();
         var player_nr = $('input[name=player]:checked').attr('id');
@@ -199,13 +393,15 @@ function card_action(card_nr) {
                 }
             });
         });
-    } else if(card_nr == '4') {
+    } 
+    else if(card_nr == '4') {
         alert('handmaid');
         $.ajax ({
             type: 'GET',
             url: 'handmaid',
         });
-    } else if(card_nr == '5') {
+    } 
+    else if(card_nr == '5') {
         players_form(1);
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
@@ -225,7 +421,8 @@ function card_action(card_nr) {
                 }
             });
         });
-    } else if(card_nr == '6') {               
+    } 
+    else if(card_nr == '6') {               
         players_form(0);
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
@@ -256,7 +453,8 @@ function card_action(card_nr) {
                 }
             });
         });
-    } else if(card_nr == '8') {
+    } 
+    else if(card_nr == '8') {
         $.ajax({
             type: 'GET',
             url: 'princess',
@@ -335,11 +533,24 @@ function drop(ev) {
         if ($('#prince').attr('class') == 'false' && $('#round_over').attr('class') == 'false') {
             alert("This is the card_id: "+data);
             alert("Inpt for function card_action(): "+$('#'+data).attr('class'));
-            card_action($('#'+data).attr('class'));
-            $.ajax({
-                type: 'GET',
-                url: 'end_turn'
-            });
+            var card_number = parseInt($('#'+data).attr('class'));
+            if(card_number == 1) {
+                guard();
+            } else if(card_number == 2) {
+                priest();
+            } else if(card_number == 3) {
+                baron();
+            } else if(card_number == 4) {
+                handmaid();
+            } else if(card_number == 5) {
+                prince();
+            } else if(card_number == 6) {
+                king();
+            } else if(card_number == 8) {
+                princess();
+            }
+            //card_action($('#'+data).attr('class'));
+            
         } else  if ($('#prince').attr('class') == 'true'){
             $('#prince').attr('class', 'false');
         }
@@ -361,13 +572,14 @@ $(document).ready(function() {
 
     if ($nr_players == "2") {
         $("#cards").before('<div id="Player1"><span>Player 1</span><span id="eliminate1" class="false"></span><div class="discarded"></div></div>');
-        $img_src = get_card_src(card_nr);
-        $you = $('<div id="you"><div id="discarded_you" ondrop="drop(event)" ondragover="allowDrop(event)"></div><span>You<br></span><span id="eliminateyou" class="false"></span></div>');
-        $('.box-body').append($you);
-        $div = $('<div id="my_cards"></div>');
-        $card = $('<img>');
-        $card.attr({
-            'src': $img_src,
+        var img_src = get_card_src(card_nr);
+        alert("My card number is: "+img_src);
+        var you = $('<div id="you"><div id="discarded_you" ondrop="drop(event)" ondragover="allowDrop(event)"></div><span>You<br></span><span id="eliminateyou" class="false"></span></div>');
+        $('#cardlist').before(you);
+        var div = $('<div id="my_cards"></div>');
+        var card = $('<img>');
+        card.attr({
+            'src': img_src,
             'id': 'card'+card_id,
             'height': '90px',
             'class': card_nr,
@@ -375,8 +587,8 @@ $(document).ready(function() {
             'ondragstart': 'drag(event)'
         });
         card_id++;
-        $div.append($card);
-        $('#you').append($div);
+        div.append(card);
+        $('#you').append(div);
         /*var form1 = $('<form name="cards" id="guard">Choose a card:<br></form>');
         var priest = $('<input>');
         priest.attr({
@@ -437,7 +649,7 @@ $(document).ready(function() {
         form1.append(priest, priest_label, baron, baron_label, handmaid, handmaid_label, prince, prince_label, king, king_label, countess, countess_label, princess, princess_label);
       */
         $('#popup_guard').hide();
-        //$('#popup_form').hide();
+        $('#popup_form').hide();
     }
 })
 myInterval = setInterval(check_discarded, '5000');

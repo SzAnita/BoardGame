@@ -8,14 +8,14 @@
     <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script type="text/javascript">
-        var guard = "{% static 'Love letter/guard.jpg'%}";
-        var priest = "{% static 'Love letter/priest.jpeg' %}";
-        var baron = "{% static 'Love letter/baron.jpg' %}";
-        var handmaid = "{% static 'Love letter/handmaid.png' %}";
-        var prince = "{% static 'Love letter/prince.webp' %}";
-        var king = "{% static 'Love letter/king.jpeg' %}";
-        var countess = "{% static 'Love letter/countess.jpeg' %}";
-        var princess = "{% static 'Love letter/princess.png' %}";
+        var Guard = "{% static 'Love letter/guard.jpg'%}";
+        var Priest = "{% static 'Love letter/priest.jpeg' %}";
+        var Baron = "{% static 'Love letter/baron.jpg' %}";
+        var Handmaid = "{% static 'Love letter/handmaid.png' %}";
+        var Prince = "{% static 'Love letter/prince.webp' %}";
+        var King = "{% static 'Love letter/king.jpeg' %}";
+        var Countess = "{% static 'Love letter/countess.jpeg' %}";
+        var Princess = "{% static 'Love letter/princess.png' %}";
     </script>
     <script type="text/javascript" src="{% static 'Love letter/loveletter.js' %}"></script>
 </head>
@@ -77,7 +77,7 @@
                <label for="8">Princess</label><br>
            </form>
        </div>
-       <div>
+       <div id="cardlist">
         <h4>List of Cards</h4>
         <ol>
             <li>8 - Princess(1): Lose if discarded</li>
