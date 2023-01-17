@@ -74,8 +74,8 @@ function players_form(prince) {
         }
         var submit = $('<input type="button" value="Submit" id="get_player">');
         form.append(submit);
-        $('#popup_form').append(form);
-        $('#popup_guard').after('#popup_form');
+        $(div).append(form);
+        $('#popup_guard').after(div);
 }
 
 function protected_players() {
@@ -116,6 +116,7 @@ function get_curr_pl() {
     });
     return you;
 }
+
 function guard() {
     players_form(0);
         $('#popup_guard').show();
@@ -141,7 +142,6 @@ function guard() {
                         $('#eliminate1').attr('class', 'true');
                         $('#eliminate1').text('Eliminated');
                     }
-                    alert("This is playernr: "+player_nr);
                     $("#"+player_nr).prop("checked", "false");
                     $("#"+card).prop("checked", "false");
                     $.ajax({
@@ -166,7 +166,6 @@ function priest() {
                     'player': player_id
                 },
                 success: function(data) {
-                    alert("This is playernr: "+player_nr);
                     $('#popup_form').remove();
                     alert(player+" has card "+data);
                     $.ajax({
@@ -531,8 +530,6 @@ function drop(ev) {
             }
         });
         if ($('#prince').attr('class') == 'false' && $('#round_over').attr('class') == 'false') {
-            alert("This is the card_id: "+data);
-            alert("Inpt for function card_action(): "+$('#'+data).attr('class'));
             var card_number = parseInt($('#'+data).attr('class'));
             if(card_number == 1) {
                 guard();
@@ -736,7 +733,7 @@ function check_discarded() {
                         }
                     });
                 }
-                /*if(response[2] == 0 && response[4] == parseInt($('#nr_pl').attr('class'))) {
+                if(response[2] == 0 && response[4] == parseInt($('#nr_pl').attr('class'))) {
                     $('#Player1 .discarded').empty();
                     $('#my_cards').empty();
                     for (var i = 0; i <= x; i++) {
@@ -756,7 +753,7 @@ function check_discarded() {
                             } 
                         }
                     });
-                }*/
+                }
             }
         });
     });
