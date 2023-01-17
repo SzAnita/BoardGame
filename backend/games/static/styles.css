@@ -112,6 +112,10 @@ ul {
 #popup_form {
     
 }
+#cards_instr {
+	max-width: 400px;
+	text-align: justify;
+}
 #my_cards {
 	position: relative;
     width: 190px;

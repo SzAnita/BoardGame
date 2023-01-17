@@ -57,10 +57,39 @@
 		</p>
 
 		<h3 id="cards">Cards</h3>
-		<ul>
-			<li><img src="{% static 'Love letter/guard.jpg' %}" alt="Guard"><br>1. Guard<br>Action: </li>
-            <li><img src="{% static 'Love Letter/priest.jpeg' %}" alt="Priest"><br></li>
-
+		<ul id="cards_instr">
+			<li><img src="{% static 'Love letter/guard.jpg' %}" alt="Guard" height="250px"><br>1. Guard
+				<br>When you discard a Guard card, you have to choose a player and name a non-Guard card. If that player has that card, that player is knocked out of the round.
+				<br>If all the other players still in the round are protected by the Handmaid, then this card does nothing
+			</li>
+            <li><img src="{% static 'Love Letter/priest.jpeg' %}" alt="Priest" height="250px"><br>2.Priest
+            	<br>When you discard a Priest card, you can look at one other player's hand.
+            </li>
+            <li><img src="{% static 'Love letter/baron.jpg' %}" alt="Baron" height="250px"><br>3. Baron
+            	<br>When you discard the Baron, choose one other player still in the round. You and 
+				that player will compare your hands. The player with the lower rank is knocked out of the round. In case of a tie, nothing happens. 
+				<br>If all other players still in the round 
+				are protected by the Handmaid, this card does nothing            	
+            </li>
+            <li><img src="{% static 'Love letter/handmaid.png' %}" alt="Handmaid" height="250px"><br>4.Handmaid
+            	<br>When you discard the Handmaid, you are protected from the effects of other players’ cards until your next turn.
+            </li>
+            <li><img src="{% static 'Love letter/prince.png'%}" alt="Prince" height="250px"><br>5. Prince
+            	<br>When you discard the card Prince, choose one player still in the round 
+				(including yourself). That player discards his or her hand (do not apply its effect) and draws a new card.
+				<br>If all other players are protected by the Handmaid, you must choose yourself.
+            </li>
+            <li><img src="{% static 'Love letter/king.jpeg' %}" alt="King" height="250px"><br>6. King
+            	<br>When you discard the King, choose a player with whom you'll trade the card in your hand with the card held by that player. You cannot trade with a player who is out of the round, nor with someone protected by the Handmaid. 
+            	<br>If all other players still in the round are protected by the Handmaid, this card does nothing.
+            </li>
+            <li><img src="{% static 'Love letter/countess.jpeg' %}" alt="Countess" height="250px"><br>7. Countess
+            	<br>The countess' effect is different from the other cards'. It applies when it's still in your hand. If you ever have the Countess and either the King or Prince in 
+				your hand, you must discard the Countess.
+            </li>
+            <li><img src="{% static 'Love letter/princess.png' %}" alt="Princess" height="250px"><br>8. Princess
+            	<br>If you discard the Princess, for whatever reason, you're out of the round.
+            </li>
 		</ul>
 	</div>
 	

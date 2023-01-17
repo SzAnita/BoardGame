@@ -21,6 +21,62 @@ function get_card_src(card_nr) {
     }
 }
 
+function players_form(prince) {
+    var div = $('<div id="popup_form"></div>');
+    var form = $('<form name="players" id="player">Choose a player:<br></form>');
+        var player1_id = $('#player1').attr('class');
+        var player1 = $('<input>');
+        player1.attr({
+            'type': 'radio',
+            'id': '_player1',
+            'name': 'player',
+            'value': player1_id,
+            'checked': 'false'
+        })
+        var label1 = $('<label for="_player1">Player 1</label><br>');
+        form.append(player1, label1);
+        if (parseInt($('#nr_pl').attr('class')) > 2) {
+            var player2_id = $('#player2').attr('class');
+            var player2 = $('<input>');
+            player2.attr({
+                'type': 'radio',
+                'id': '_player2',
+                'name': 'player',
+                'value': player2_id,
+                'checked': 'false'
+            });
+            var label2 = $('<label for="_player2">Player 2</label><br>');
+            form.append(player2, label2);
+        }
+        if (parseInt($('#nr_pl').attr('class')) == 4) {
+            var player3_id = $('#player3').attr('class');
+            var player3 = $('<input>');
+            player3.attr({
+                'type': 'radio',
+                'id': '_player3',
+                'name': 'player',
+                'value': player3_id,
+                'checked': 'false'
+            });
+            var label3 = $('<label for="_player3">Player 3</label><br>');
+            form.append(player3, label3);
+        }
+        if (prince == 1) {
+           var me = $('<input>');
+            me.attr({
+                'type': 'radio',
+                'id': 'me',
+                'name': 'player',
+                'value': $('#user').attr('id')
+            });
+            var labelme = $('<label for="me">You</label><br>');
+            form.append(me, labelme); 
+        }
+        var submit = $('<input type="button" value="Submit" id="get_player">');
+        form.append(submit);
+        $('#boxbody').append(form);
+}
+
 function protected_players() {
     var x = ''
     $.ajax({
@@ -62,7 +118,7 @@ function get_curr_pl() {
 
 function card_action(card_nr) {
     if (card_nr == '1') {
-        $('#popup_form').show();
+        players_form(0);
         $('#popup_guard').show();
         $('#get_player').click(function(){
             var player_id = $('input[name=player]:checked').val();
@@ -77,7 +133,7 @@ function card_action(card_nr) {
                     'card': card
                 },
                 success: function(data) {
-                    $('#popup_form').hide();
+                    $('#popup_form').remove();
                     $('#popup_guard').hide();
                     if (data == '0') {
                         alert(player+" didn't have card "+card);
@@ -93,7 +149,7 @@ function card_action(card_nr) {
             });
         });
     } else if(card_nr == '2') {
-        $('#popup_form').show();
+        players_form(0);
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
             var player_nr = $('input[name=player]:checked').attr('id');
@@ -106,14 +162,13 @@ function card_action(card_nr) {
                 },
                 success: function(data) {
                     alert("This is playernr: "+player_nr);
-                    $('#popup_form').hide();
+                    $('#popup_form').remove();
                     alert(player+" has card "+data);
-                    $("#"+player_nr).prop("checked", "false");
                 }
             });
         });
     } else if(card_nr == '3') {
-        $('#popup_form').show();
+        players_form(0);
         var player_id = $('input[name=player]:checked').val();
         var player_nr = $('input[name=player]:checked').attr('id');
         var player = $('label[for='+player_nr+']').html();
@@ -125,7 +180,7 @@ function card_action(card_nr) {
                     'player': player_id
                 },
                 success: function(data) {
-                    $('#popup_form').hide();
+                    $('#popup_form').remove();
                     response = JSON.parse(data);
                     if(response[0] == 1) {
                         alert(player+" has card "+data[1]+" so you have eliminated "+player);
@@ -141,7 +196,6 @@ function card_action(card_nr) {
                         alert(data);
                         alert("Data is not of type string");
                     }
-                    $("#"+player_nr).prop("checked", "false");
                 }
             });
         });
@@ -152,16 +206,7 @@ function card_action(card_nr) {
             url: 'handmaid',
         });
     } else if(card_nr == '5') {
-        $('#popup_form').show();
-        var me = $('<input>');
-        me.attr({
-            'type': 'radio',
-            'id': 'me',
-            'name': 'player',
-            'value': $('#user').attr('id')
-        });
-        var label2 = $('<label for="me">You</label><br>');
-        $('#get_player').before(me, label2);
+        players_form(1);
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
             var player_nr = $('input[name=player]:checked').attr('id');
@@ -176,15 +221,12 @@ function card_action(card_nr) {
                     'player': player_id
                 },
                 success: function(data) {
-                    $('#popup_form').hide();
-                    me.remove();
-                    label2.remove();
-                    $("#"+player_nr).prop("checked", "false");
+                    $('#popup_form').remove();
                 }
             });
         });
     } else if(card_nr == '6') {               
-        $('#popup_form').show();
+        players_form(0);
         $('#get_player').click(function() {
             var player_id = $('input[name=player]:checked').val();
             var player_nr = $('input[name=player]:checked').attr('id');
@@ -197,7 +239,7 @@ function card_action(card_nr) {
                     'player': player_id
                 },
                 success: function(data) {
-                    $('#popup_form').hide();
+                    $('#popup_form').remove();
                     $('#my_cards img').remove();
                     $img = get_card_src(data);
                     $card = $('<img>');
@@ -292,6 +334,7 @@ function drop(ev) {
         });
         if ($('#prince').attr('class') == 'false' && $('#round_over').attr('class') == 'false') {
             alert("This is the card_id: "+data);
+            alert("Inpt for function card_action(): "+$('#'+data).attr('class'));
             card_action($('#'+data).attr('class'));
             $.ajax({
                 type: 'GET',
@@ -392,20 +435,7 @@ $(document).ready(function() {
         });
         var princess_label = $('<label for="8">Princess</label><br>');
         form1.append(priest, priest_label, baron, baron_label, handmaid, handmaid_label, prince, prince_label, king, king_label, countess, countess_label, princess, princess_label);
-      */var form2 = $('<form name="players" id="player">Choose a player:<br></form>');
-        var player1_id = $('#player1').attr('class');
-        var player1 = $('<input>');
-        player1.attr({
-            'type': 'radio',
-            'id': '_player1',
-            'name': 'player',
-            'value': player1_id,
-            'checked': 'false'
-        })
-        var label1 = $('<label for="_player1">Player 1</label><br>');
-        var submit = $('<input type="button" value="Submit" id="get_player">');
-        form2.append(player1, label1, submit);
-        $('#popup_form').append(form2);
+      */
         $('#popup_guard').hide();
         //$('#popup_form').hide();
     }
@@ -494,7 +524,7 @@ function check_discarded() {
                         }
                     });
                 }
-                if(response[2] == 0 && response[4] == parseInt($('#nr_pl').attr('class'))) {
+                /*if(response[2] == 0 && response[4] == parseInt($('#nr_pl').attr('class'))) {
                     $('#Player1 .discarded').empty();
                     $('#my_cards').empty();
                     for (var i = 0; i <= x; i++) {
@@ -514,7 +544,7 @@ function check_discarded() {
                             } 
                         }
                     });
-                }
+                }*/
             }
         });
     });
