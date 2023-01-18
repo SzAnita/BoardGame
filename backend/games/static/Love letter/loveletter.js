@@ -572,7 +572,7 @@ function drop(ev) {
                 parseInt(response);
                 if (response != 0) {
                     alert("This should be the winner's id: "+data+ " "+response);
-                    var player = $('#data span .'+data).attr('id');
+                    var player = $('#data span.'+data).attr('id');
                     alert(player+" has won");
                 }
                $('.box_body').append('<p>Ajax request succeeded</p>');
