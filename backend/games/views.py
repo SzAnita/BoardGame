@@ -362,9 +362,12 @@ def update_discarded(request):
         for x in range(nr_discarded, discarded):
             cards.append(ll[game_id].players[player1].cards['discarded'][x])
         response.append(cards)
-    else:
+    elif discarded != 0:
         response.append(nr_discarded - discarded)
+    else:
+        response.append(0)
     if (len(ll[game_id].cards) == 0 or ll[game_id].eliminated == ll[game_id].game.nr_players - 1) and ll[game_id].round_win == '':
+        ll[game_id].players[user].round_over = 1
         ll[game_id].rounds += 1
         ll[game_id].curr_round = False
         max_card = 0
@@ -378,7 +381,9 @@ def update_discarded(request):
         ll[game_id].active = winner
 
         response.append(0)
-    elif ll[game_id].round_win != '' :
+    elif ll[game_id].round_win != '' and ll[game_id].players[user].round_over == 1:
+        if ll[game_id].players[user].round_over == 1:
+            ll[game_id].players[user].round_over = 2 
         response.append(-1)
     else:
         response.append(1)
@@ -387,8 +392,8 @@ def update_discarded(request):
         response.append(p.msg)
         response.append(p.card_sel)
         ll[game_id].players[user].change = 0
-    if p.msg == 'king':
-        response.append(p.cards['curr'][0])
+        if p.msg == 'king':
+            response.append(p.cards['curr'][0])
     if p.msg != 'prince':
         p.msg = ''
     p.card_sel = ''
@@ -400,15 +405,27 @@ def update_discarded(request):
     else:
         response.append('tie')
     response.append(ll[game_id].eliminated)
+    response.append(ll[game_id].players[user].round_over)
+    if ll[game_id].players[user].round_over == 1:
+        ll[game_id].players[user].round_over = 2
+    roundover = 0
+    for pl in ll[game_id].players:
+        if ll[game_id].players[pl].round_over > 0:
+            roundover += 1
+    if roundover == ll[game_id].game.game_nr:
+        response.append(1)
+    else:
+        response.append(0)
     return HttpResponse(json.dumps(response))
 
 
 def protected_players(request):
     user = request.session.get('user_id')
     game_id = Users.objects.get(user_nr=user).game_nr
+    player = request.GET.get('player')
     response = 0
     for x in ll[game_id].players:
-        if x != user and not ll[game_id].players[x].handmaid:
+        if x == player and ll[game_id].players[x].handmaid:
             response = 1
             break
     return HttpResponse(json.dumps(response))
@@ -438,19 +455,47 @@ def round_over(request):
             for pl in ll[game_id].players:
                 ll[game_id].players[pl].round_over = 0
             response.append(0)
-    else:
-        response.append(1)
+        else:
+            response.append(1)
     return HttpResponse(json.dumps(response))
 
 
 def check_tokens(request):
     user = request.session.get('user_id')
     game_id = Users.objects.get(user_nr=user).game_nr
+    ll[game_id].players[user].cards['curr'].clear()
+    ll[game_id].players[user].cards['discarded'].clear()
+    ll[game_id].active = ll[game_id].game.player1
+    ll[game_id].players[user].eliminate = False
+    ll[game_id].players[user].round_over = 1
+    newround = 1
+    for pl in ll[game_id].players:
+        if ll[game_id].players[pl].round_over == 0:
+            newround = 0
+    if newround == 1:
+        ll[game_id].cards.clear()
+        for x in range(0, 5):
+            ll[game_id].cards.append(1)
+        ll[game_id].cards.append(2)
+        ll[game_id].cards.append(2)
+        ll[game_id].cards.append(3)
+        ll[game_id].cards.append(3)
+        ll[game_id].cards.append(4)
+        ll[game_id].cards.append(4)
+        ll[game_id].cards.append(5)
+        ll[game_id].cards.append(5)
+        ll[game_id].cards.append(6)
+        ll[game_id].cards.append(7)
+        ll[game_id].cards.append(8)
+        for x in range(0, 3):
+            rand = random.randint(0, len(ll[game_id].cards) - 1)
+            ll[game_id].cards.pop(rand) 
+    #ll[game_id].players[]
     max_token = ll[game_id].players[user].tokens
     p = ll[game_id].players[user]
     for pl in ll[game_id].players:
         if ll[game_id].players[pl].tokens > max_token:
-            max_token = pl.tokens
+            max_token = ll[game_id].players[pl].tokens
             p = pl
     response = []
     tokens = {'user': ll[game_id].players[user].tokens}
@@ -459,7 +504,7 @@ def check_tokens(request):
         if game.player1 != user:
             tokens['player1'] = ll[game_id].players[game.player1].tokens
         else:
-            tokens['player1'] = ll[game_id].players[game.player2]
+            tokens['player1'] = ll[game_id].players[game.player2].tokens
     elif game.nr_players == 3:
         if game.player1 == user:
             tokens['player1'] = ll[game_id].players[game.player2].tokens
@@ -490,9 +535,21 @@ def check_tokens(request):
     response.append(tokens)     
     if max_token == ll[game_id].tokens_to_win:
         response.append(1)
-        response.append(p.id)
+        response.append(ll[game_id].players[p].id)
     else:
-        response.append(0)       
+        response.append(0)     
+    ll[game_id].players[user].round_over = 1  
+    return HttpResponse(json.dumps(response))
+
+def round_winner(request):
+    user = request.session.get('user_id')
+    game_id = Users.objects.get(user_nr=user).game_nr
+    response = []
+    if ll[game_id].round_win != user:
+        response.append("Player 1")
+    else:
+        response.append("You")
+    response.append(ll[game_id].round_win)
     return HttpResponse(json.dumps(response))
 
 

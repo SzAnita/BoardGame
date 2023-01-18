@@ -22,60 +22,97 @@ function get_card_src(card_nr) {
 }
 
 function players_form(prince) {
+    var choose = false;
     var div = $('<div id="popup_form"></div>');
     var form = $('<form name="players" id="player">Choose a player:<br></form>');
-        var player1_id = $('#player1').attr('class');
-        var player1 = $('<input>');
-        player1.attr({
+    var player1_id = $('#player1').attr('class');
+    $.ajax({
+        type:'GET',
+        url:'protected_players',
+        data: {
+            'player':player1_id
+        },
+        success:function(data) {
+            if(JSON.parse(data) == 0) {
+                var player1 = $('<input>');
+                player1.attr({
+                    'type': 'radio',
+                    'id': '_player1',
+                    'name': 'player',
+                    'value': player1_id,
+                    'checked': 'false'
+                });
+                var label1 = $('<label for="_player1">Player 1</label><br>');
+                form.append(player1, label1);
+                choose = true;
+            }
+        }
+    });
+    
+    if (parseInt($('#nr_pl').attr('class')) > 2) {
+        var player2_id = $('#player2').attr('class');
+        $.ajax({
+            type:'GET',
+            url:'protected_players',
+            data: {
+                'player':player2_id
+            },
+            success:function(data) {
+                if(JSON.parse(data) == 0) {
+                    var player2 = $('<input>');
+                    player2.attr({
+                        'type': 'radio',
+                        'id': '_player2',
+                        'name': 'player',
+                        'value': player2_id,
+                    });
+                    var label2 = $('<label for="_player2">Player 2</label><br>');
+                    form.append(player2, label2);
+                    choose = true;
+                }
+            }
+        });
+    }
+    if (parseInt($('#nr_pl').attr('class')) == 4) {
+        var player3_id = $('#player3').attr('class');
+        $.ajax({
+            type:'GET',
+            url:'protected_players',
+            data: {
+                'player':player3_id
+            },
+            success:function(data) {
+                if(JSON.parse(data) == 0) {
+                     var player3 = $('<input>');
+                    player3.attr({
+                        'type': 'radio',
+                        'id': '_player3',
+                        'name': 'player',
+                        'value': player3_id,
+                        'checked': 'false'
+                    });
+                    var label3 = $('<label for="_player3">Player 3</label><br>');
+                    form.append(player3, label3);
+                    choose = true;
+                }
+            }
+        });
+    }
+    if (prince == 1) {
+        var me = $('<input>');
+        me.attr({
             'type': 'radio',
-            'id': '_player1',
+            'id': 'me',
             'name': 'player',
-            'value': player1_id,
-            'checked': 'false'
-        })
-        var label1 = $('<label for="_player1">Player 1</label><br>');
-        form.append(player1, label1);
-        if (parseInt($('#nr_pl').attr('class')) > 2) {
-            var player2_id = $('#player2').attr('class');
-            var player2 = $('<input>');
-            player2.attr({
-                'type': 'radio',
-                'id': '_player2',
-                'name': 'player',
-                'value': player2_id,
-                'checked': 'false'
-            });
-            var label2 = $('<label for="_player2">Player 2</label><br>');
-            form.append(player2, label2);
-        }
-        if (parseInt($('#nr_pl').attr('class')) == 4) {
-            var player3_id = $('#player3').attr('class');
-            var player3 = $('<input>');
-            player3.attr({
-                'type': 'radio',
-                'id': '_player3',
-                'name': 'player',
-                'value': player3_id,
-                'checked': 'false'
-            });
-            var label3 = $('<label for="_player3">Player 3</label><br>');
-            form.append(player3, label3);
-        }
-        if (prince == 1) {
-           var me = $('<input>');
-            me.attr({
-                'type': 'radio',
-                'id': 'me',
-                'name': 'player',
-                'value': $('#user').attr('id')
-            });
-            var labelme = $('<label for="me">You</label><br>');
-            form.append(me, labelme); 
-        }
-        var submit = $('<input type="button" value="Submit" id="get_player">');
-        form.append(submit);
-        $(div).append(form);
-        $('#popup_guard').after(div);
+            'value': $('#user').attr('id')
+        });
+        var labelme = $('<label for="me">You</label><br>');
+        form.append(me, labelme); 
+    }
+    var submit = $('<input type="button" value="Submit" id="get_player">');
+    form.append(submit);
+    $(div).append(form);
+    $('#popup_guard').after(div);
 }
 
 function protected_players() {
@@ -198,8 +235,8 @@ function baron() {
                         $('#eliminate1').html('Eliminated');
                     } else if(response[0] == -1) {
                         alert(player+" has card"+data[1]+" so you have been eliminated by"+player);
-                        $('#'+player+' #eliminated').attr('class', 'true');
-                        $('#'+player+' #eliminated').html('Eliminated');
+                        $('#eliminateyou').attr('class', 'true');
+                        $('#eliminateyou').html('Eliminated');
                     } else if(response[0] == 0) {
                         alert("Both of you have the same cards");
                     } else {
@@ -292,6 +329,13 @@ function king() {
         });
 }
 
+function countess() {
+    $.ajax({
+        type: 'GET',
+        url: 'round_over'
+    });
+}
+
 function princess() {
     $.ajax({
         type: 'GET',
@@ -301,6 +345,10 @@ function princess() {
                 type: 'GET',
                 url: 'end_turn'
             });
+            $.ajax({
+                type: 'GET',
+                url: 'round_over'
+            })
         }
     });
     $('#eliminateyou').attr('class', 'true');
@@ -507,10 +555,11 @@ function drop(ev) {
     var data = ev.dataTransfer.getData("text");
     ev.target.appendChild(document.getElementById(data));
     if(get_curr_pl() == true || $('#prince').attr('class') == 'false') {
-        if ($('#'+data).attr('class') == '8') {
+        /*if ($('#'+data).attr('class') == '8') {
             $('#eliminateyou').attr('class', 'true');
             $('#eliminateyou').html('Eliminated');
-        }
+
+        }*/
         $.ajax ({
             type: 'GET',
             url: 'discard_card',
@@ -566,11 +615,9 @@ function drop(ev) {
 $(document).ready(function() {
     $nr_players = $('#nr_pl').attr('class');
     var card_nr = $('#card_nr').attr('class');
-
     if ($nr_players == "2") {
         $("#cards").before('<div id="Player1"><span>Player 1</span><span id="eliminate1" class="false"></span><div class="discarded"></div></div>');
         var img_src = get_card_src(card_nr);
-        alert("My card number is: "+img_src);
         var you = $('<div id="you"><div id="discarded_you" ondrop="drop(event)" ondragover="allowDrop(event)"></div><span>You<br></span><span id="eliminateyou" class="false"></span></div>');
         $('#cardlist').before(you);
         var div = $('<div id="my_cards"></div>');
@@ -717,28 +764,22 @@ function check_discarded() {
                         $('#my_cards').append(card);
                     }
                 }
-                if ((response[1] == 0 || response[1] == -1) && $('#round_over').attr('class') == 'false') {
+                if ((response[1] == 0 ) && $('#round_over').attr('class') == 'false') {
                     alert("This round has ended. Please discard your card");
-                    $('#my_cards img').attr('draggable', 'true');
-                    $('#round_over').attr('class', 'true');
-                } else if(response[1] == -1 && $('#round_over').attr('class') == 'true') {
-                    $.ajax({
-                        type: 'GET',
-                        url: 'round_over',
-                        success: function(data) {
-                            var response = JSON.parse(data);
-                            if (response == 1) {
-                                $('#round_over').attr('class', 'false');
-                            }
-                        }
-                    });
-                }
-                if(response[2] == 0 && response[4] == parseInt($('#nr_pl').attr('class'))) {
                     $('#Player1 .discarded').empty();
                     $('#my_cards').empty();
+                    $('#discarded_you').empty();
+                    $('#round_over').attr('class', 'false')
                     for (var i = 0; i <= x; i++) {
                         $('#'+i).show();
                     }
+                    $.ajax({
+                        type: 'GET',
+                        url: 'round_winner',
+                        success: function(data) {
+                            alert("The winner of the round is "+data);
+                        }
+                    })
                     $.ajax({
                         type: 'GET',
                         url: 'check_tokens',
@@ -746,14 +787,62 @@ function check_discarded() {
                             var response = JSON.parse(data);
                             var tokens = response[0];
                             for(p in tokens) {
-                                $('#token'+p).text(tokens[p]);
+                                $('#token'+p).text('p: '+tokens[p]);
                             }  
                             if(response[1] == 1) {
                                 alert("The winner of the game is: "+$('#'+response[2]).attr('class'));
                             } 
                         }
                     });
+                    $('#Player1 #eliminate1').attr('class', 'false');
+                    $('#Player1 #eliminate1').empty();
+                    $('#you #eliminateyou').attr('class', 'false');
+                    $('#you #eliminateyou').empty();
+                    draw_card();
+                } /*else if(response[1] == -1 && $('#round_over').attr('class') == 'true') {
+                    $.ajax({
+                        type: 'GET',
+                        url: 'round_over',
+                        success: function(data) {
+                            var response = JSON.parse(data);
+                            if (response == 0) {
+                                $('#round_over').attr('class', 'false');
+                            }
+                        }
+                    });
                 }
+                /*if(response[2] == 0 && response[4] + 1 == parseInt($('#nr_pl').attr('class'))) {
+                    if ($('#round_over').attr('class') == "true" && response[5] == 0) {
+                        $('#Player1 .discarded').empty();
+                        $('#my_cards').empty();
+                        $('#discarded_you').empty();
+                        $('#round_over').attr('class', 'false')
+                        for (var i = 0; i <= x; i++) {
+                            $('#'+i).show();
+                        }
+                        $.ajax({
+                            type: 'GET',
+                            url: 'check_tokens',
+                            success: function(data) {
+                                var response = JSON.parse(data);
+                                var tokens = response[0];
+                                for(p in tokens) {
+                                    $('#token'+p).text(tokens[p]);
+                                }  
+                                if(response[1] == 1) {
+                                    alert("The winner of the game is: "+$('#'+response[2]).attr('class'));
+                                } 
+                            }
+                        });
+                    } else if(response[6] == 1) {
+                        $('#Player1 #eliminate1').attr('class', 'false');
+                        $('#Player1 #eliminate1').empty();
+                        $('#you #eliminateyou').attr('class', 'false');
+                        $('#you #eliminateyou').empty();
+                        draw_card();
+                        $('#round_over').attr('class', 'false');
+                    }
+                }*/
             }
         });
     });

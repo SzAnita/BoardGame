@@ -28,18 +28,15 @@
                 <ul class="dropdown">
                     <div class="dropdown-content">
                         <li><a class="action" href="../">Love Letter</a></li>
-                        <li><a class="action" href="../../kingdomino">KingDomino</a></li>
                     </div>
                 </ul>
             </div>
         </li>
-        <li><a class="navbar" href="stats">Statistics</a></li>
    </ul>
    <div class="box-body" id='boxbody'>
         <div id="data">
             <span>Number of players: {{ nr_players }}<br></span>
             <span>Number of tokens necessary to win: {{ nr_tokens }}<br></span>
-            <span>Your tokens: {{ tokens }}<br></span>
             <span>Tokens<br></span>
             {% for k, v in tokens.items %}
                 <span id="token{{ k }}">{{ k }}: {{ v }}<br></span>
@@ -61,25 +58,25 @@
            </div>
        <div id="popup_guard">
            <form id="guard_card" name="cards">Choose a card:<br>
-               <input type="radio" id="2" name="card" value="2" checked="false">
+               <input type="radio" id="2" name="card" value="2">
                <label for="2">Priest</label><br>
-               <input type="radio" id="3" name="card" value="3" checked="false">
+               <input type="radio" id="3" name="card" value="3">
                <label for="3">Baron</label><br>
-               <input type="radio" id="4" name="card" value="4" checked="false">
+               <input type="radio" id="4" name="card" value="4">
                <label for="4">Handmaid</label><br>
-               <input type="radio" id="5" name="card" value="5" checked="false">
+               <input type="radio" id="5" name="card" value="5">
                <label for="5">Prince</label><br>
-               <input type="radio" id="6" name="card" value="6" checked="false">
+               <input type="radio" id="6" name="card" value="6">
                <label for="6">King</label><br>
-               <input type="radio" id="7" name="card" value="7" checked="false">
+               <input type="radio" id="7" name="card" value="7">
                <label for="7">Countess</label><br>
-               <input type="radio" id="8" name="card" value="8" checked="false">
+               <input type="radio" id="8" name="card" value="8">
                <label for="8">Princess</label><br>
            </form>
        </div>
        <div id="cardlist">
         <h4>List of Cards</h4>
-        <ol>
+        <ul>
             <li>8 - Princess(1): Lose if discarded</li>
             <li>7 - Countess(1): Discard if together with King or Prince</li>
             <li>6 - King(1): Trade hands with another player</li>
@@ -88,7 +85,7 @@
             <li>3 - Baron(2): Compare your card with another player, the player with the lower hand is out of the round</li>
             <li>2 - Priest(2): Look at someone's card</li>
             <li>1 - Guard(5): Guess a player's card, if you guessed right, he or she is out</li>
-        </ol>
+        </ul>
        </div>
    </div>
 </body>
