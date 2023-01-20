@@ -592,7 +592,9 @@ function drop(ev) {
                 prince();
             } else if(card_number == 6) {
                 king();
-            } else if(card_number == 8) {
+            } else if(card_number == 7){
+                countess();
+            }else if(card_number == 8) {
                 princess();
             }
             //card_action($('#'+data).attr('class'));
